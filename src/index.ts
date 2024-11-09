@@ -52,7 +52,7 @@ class LifeClock {
     return (Date.now() - this.birthday.valueOf()) / this.meanLifeDurationMs
   }
 
-  public getCurrentLifeValues() {
+  public getTime() {
     const lifePercentage = this.getLifePercentage()
 
     const daysRaw = lifePercentage
@@ -69,6 +69,11 @@ class LifeClock {
     const minutes = Math.trunc(minutesRaw)
     const minutesFractional = minutesRaw - minutes
 
+    const secondsInMinute = 60
+    const secondsRaw = minutesFractional * secondsInMinute
+    const seconds = Math.trunc(secondsRaw)
+    const secondsFractional = secondsRaw - seconds
+
     return {
       lifePercentage,
       daysRaw,
@@ -79,6 +84,9 @@ class LifeClock {
       minutesRaw,
       minutes,
       minutesFractional,
+      secondsRaw,
+      seconds,
+      secondsFractional,
     }
   }
 
@@ -99,8 +107,11 @@ function main() {
   const lifeClock = new LifeClock()
 
   const watchAnimation = (displayDots = true) => {
-    const { hours, minutes } = lifeClock.getCurrentLifeValues()
-    timerNode.innerText = formatClockValue(hours) + (displayDots ? ':' : ' ') + formatClockValue(minutes)
+    const { hours, minutes, seconds } = lifeClock.getTime()
+    const separator = displayDots ? ':' : ' '
+
+    timerNode.innerText =
+      formatClockValue(hours) + separator + formatClockValue(minutes) + separator + formatClockValue(seconds)
     setTimeout(() => watchAnimation(!displayDots), 1000)
   }
 

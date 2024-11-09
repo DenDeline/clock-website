@@ -107,11 +107,10 @@ function main() {
   const lifeClock = new LifeClock()
 
   const watchAnimation = (displayDots = true) => {
-    const { hours, minutes, seconds } = lifeClock.getTime()
+    const { hours, minutes } = lifeClock.getTime()
     const separator = displayDots ? ':' : ' '
 
-    timerNode.innerText =
-      formatClockValue(hours) + separator + formatClockValue(minutes) + separator + formatClockValue(seconds)
+    timerNode.innerText = formatClockValue(hours) + separator + formatClockValue(minutes)
     setTimeout(() => watchAnimation(!displayDots), 1000)
   }
 

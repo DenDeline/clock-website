@@ -8,11 +8,7 @@ class LifeClock {
   private _meanDeathDay: Date | null = null
   private _meanLifeDurationMs: number | null = null
 
-  private readonly _timerNode: HTMLElement
-
-  constructor(timerNode: HTMLElement) {
-    this._timerNode = timerNode
-  }
+  constructor() {}
 
   public get meanDeathAge(): number {
     return this._meanDeathAge
@@ -100,7 +96,7 @@ function main() {
     return
   }
 
-  const lifeClock = new LifeClock(timerNode)
+  const lifeClock = new LifeClock()
 
   const watchAnimation = (displayDots = true) => {
     const { hours, minutes } = lifeClock.getCurrentLifeValues()

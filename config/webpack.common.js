@@ -2,14 +2,8 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const config = {
-  mode: 'development',
-  devtool: 'inline-source-map',
-  entry: './src/index.ts',
-  devServer: {
-    open: true,
-    client: {
-      progress: true,
-    }
+  entry: {
+    app: './src/index.ts'
   },
   module: {
     rules: [
@@ -30,13 +24,13 @@ const config = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '../dist'),
   },
   plugins: [
     new HtmlWebpackPlugin({
       cache: false,
       inject: true,
-      template: path.resolve(__dirname, './public/index.html'),
+      template:  path.resolve(__dirname, '../public/index.html'),
     })
   ],
 }

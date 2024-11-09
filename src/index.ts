@@ -108,9 +108,9 @@ function main() {
 
   const watchAnimation = (displayDots = true) => {
     const { hours, minutes } = lifeClock.getTime()
-    const separator = displayDots ? ':' : ' '
+    const separator = `<span style="visibility: ${displayDots ? 'visible' : 'hidden'}">:</span>`
 
-    timerNode.innerText = formatClockValue(hours) + separator + formatClockValue(minutes)
+    timerNode.innerHTML = formatClockValue(hours) + separator + formatClockValue(minutes)
     setTimeout(() => watchAnimation(!displayDots), 1000)
   }
 

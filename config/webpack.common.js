@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const config = {
   entry: {
-    app: './src/index.ts'
+    app: './src/index.ts',
   },
   module: {
     rules: [
@@ -12,8 +12,8 @@ const config = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
-          }
+            presets: ['@babel/preset-env'],
+          },
         },
         exclude: /node_modules/,
       },
@@ -25,6 +25,9 @@ const config = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      '@': path.resolve(__dirname, '../src'),
+    },
   },
   output: {
     filename: 'bundle.js',
@@ -35,7 +38,7 @@ const config = {
       cache: false,
       inject: true,
       template: path.resolve(__dirname, '../public/index.html'),
-    })
+    }),
   ],
 }
 

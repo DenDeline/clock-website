@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DenDeline/life-website.git"
+    "url": "git+https://github.com/DenDeline/clock-website.git.git"
   },
   "author": "Rostislav Statko",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/DenDeline/life-website/issues"
+    "url": "https://github.com/DenDeline/clock-website/issues"
   },
-  "homepage": "https://github.com/DenDeline/life-website#readme",
+  "homepage": "https://github.com/DenDeline/clock-website#readme",
   "description": "Life is like a clock",
   "devDependencies": {
     "@babel/core": "^7.26.0",

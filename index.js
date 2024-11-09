@@ -19,27 +19,43 @@ function LifeClock(options) {
     lifeMeanAge = 76
   } = options
 
-  this.birthday = birthday
+  this._birthday = birthday
   this._timerNode = timerNode
   this._lifeMeanAge = lifeMeanAge
   this._maybeMaxBirthday = null
+  this._lifeDelta = null
 }
 
 LifeClock.prototype.getAge = function () {
-  const ageDifMs = Date.now() - this.birthday
+  const ageDifMs = Date.now() - this._birthday
   const ageDate = new Date(ageDifMs)
   return Math.abs(ageDate.getUTCFullYear() - 1970)
 }
 
+LifeClock.prototype.getBirthday = function () {
+  return this._birthday
+}
+
 LifeClock.prototype.getMaybeMaxBirthday = function() {
   if (!this._maybeMaxBirthday) {
-    this._maybeMaxBirthday = addYearsToBirthday(this.birthday, this._lifeMeanAge)
+    this._maybeMaxBirthday = addYearsToBirthday(this.getBirthday(), this._lifeMeanAge)
   }
   return this._maybeMaxBirthday
 }
 
+LifeClock.prototype.calculateLifeDelta = function (fraction = 1) {
+  return fraction * (this.getMaybeMaxBirthday() - this.getBirthday())
+}
+
+LifeClock.prototype.getLifeDelta = function() {
+  if(!this._lifeDelta) {
+    this._lifeDelta = this.calculateLifeDelta()
+  }
+  return this._lifeDelta
+}
+
 LifeClock.prototype.getLifePercentage = function() {
-  return getElapsedTimeInPercentage(this.birthday, this.getMaybeMaxBirthday())
+  return (Date.now() - this.getBirthday()) / this.getLifeDelta()
 }
 
 LifeClock.prototype.getCurrentLifeValues = function(){
@@ -57,6 +73,7 @@ LifeClock.prototype.getCurrentLifeValues = function(){
   const minutesInHour = 60
   const minutesRaw = hoursFractional * minutesInHour
   const minutes = Math.trunc(minutesRaw)
+  const minutesFractional = minutesRaw - minutes
 
   return {
     lifePercentage,
@@ -64,15 +81,20 @@ LifeClock.prototype.getCurrentLifeValues = function(){
     days,
     hoursRaw,
     hours,
+    hoursFractional,
     minutesRaw,
-    minutes
+    minutes,
+    minutesFractional
   }
 }
 
 
 LifeClock.prototype.watchAnimation = function(displayDots = true) {
-  const { hours, minutes} = this.getCurrentLifeValues()
+  const { hours, minutes, hoursFractional} = this.getCurrentLifeValues()
+
+
   this._timerNode.innerText = getClockValue(hours) + (displayDots ? ":" : " ") + getClockValue(minutes)
+
   setTimeout(() => this.watchAnimation(!displayDots), 1000)
 }
 

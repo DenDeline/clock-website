@@ -4,45 +4,56 @@ import { addYearsToDate, formatClockValue } from '@/utils'
 
 class LifeClock {
   private _birthday: Date = new Date('2002-08-20T00:00:00.000')
-  private _maybeMaxBirthday: Date | null = null
-  private _lifeDelta: number | null = null
-  private readonly _lifeMeanAge = 76
+  private _meanDeathAge = 76
+  private _meanDeathDay: Date | null = null
+  private _meanLifeDurationMs: number | null = null
+
   private readonly _timerNode: HTMLElement
 
   constructor(timerNode: HTMLElement) {
     this._timerNode = timerNode
   }
 
+  public get meanDeathAge(): number {
+    return this._meanDeathAge
+  }
+
+  public set meanDeathAge(value: number) {
+    this._meanDeathAge = value
+    this._meanDeathDay = null
+    this._meanLifeDurationMs = null
+  }
+
   public get birthday(): Date {
     return this._birthday
   }
 
-  // public set birthday(value: Date) {
-  //   this._birthday = value
-  //   this._maybeMaxBirthday = null
-  //   this._lifeDelta = null
-  // }
+  public set birthday(value: Date) {
+    this._birthday = value
+    this._meanDeathDay = null
+    this._meanLifeDurationMs = null
+  }
 
-  public get maybeMaxBirthday(): Date {
-    if (!this._maybeMaxBirthday) {
-      this._maybeMaxBirthday = addYearsToDate(this.birthday, this._lifeMeanAge)
+  public get meanDeathDay(): Date {
+    if (!this._meanDeathDay) {
+      this._meanDeathDay = addYearsToDate(this.birthday, this.meanDeathAge)
     }
-    return this._maybeMaxBirthday
+    return this._meanDeathDay
   }
 
   public calculateLifeDelta(fraction = 1): number {
-    return fraction * (this.maybeMaxBirthday.valueOf() - this.birthday.valueOf())
+    return fraction * (this.meanDeathDay.valueOf() - this.birthday.valueOf())
   }
 
-  public get lifeDelta(): number {
-    if (!this._lifeDelta) {
-      this._lifeDelta = this.calculateLifeDelta()
+  public get meanLifeDurationMs(): number {
+    if (!this._meanLifeDurationMs) {
+      this._meanLifeDurationMs = this.calculateLifeDelta()
     }
-    return this._lifeDelta
+    return this._meanLifeDurationMs
   }
 
   public getLifePercentage(): number {
-    return (Date.now() - this.birthday.valueOf()) / this.lifeDelta
+    return (Date.now() - this.birthday.valueOf()) / this.meanLifeDurationMs
   }
 
   public getCurrentLifeValues() {
@@ -75,16 +86,10 @@ class LifeClock {
     }
   }
 
-  // public getAge  () {
-  //   const ageDifMs = Date.now() - this.birthday.valueOf()
-  //   const ageDate = new Date(ageDifMs)
-  //   return Math.abs(ageDate.getUTCFullYear() - 1970)
-  // }
-
-  public watchAnimation(displayDots = true): void {
-    const { hours, minutes } = this.getCurrentLifeValues()
-    this._timerNode.innerText = formatClockValue(hours) + (displayDots ? ':' : ' ') + formatClockValue(minutes)
-    setTimeout(() => this.watchAnimation(!displayDots), 1000)
+  public getAge() {
+    const ageDifMs = Date.now() - this.birthday.valueOf()
+    const ageDate = new Date(ageDifMs)
+    return Math.abs(ageDate.getUTCFullYear() - 1970)
   }
 }
 
@@ -96,7 +101,14 @@ function main() {
   }
 
   const lifeClock = new LifeClock(timerNode)
-  lifeClock.watchAnimation()
+
+  const watchAnimation = (displayDots = true) => {
+    const { hours, minutes } = lifeClock.getCurrentLifeValues()
+    timerNode.innerText = formatClockValue(hours) + (displayDots ? ':' : ' ') + formatClockValue(minutes)
+    setTimeout(() => watchAnimation(!displayDots), 1000)
+  }
+
+  watchAnimation()
 }
 
 main()

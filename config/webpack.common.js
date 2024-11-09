@@ -10,12 +10,16 @@ const config = {
       {
         test: /\.tsx?$/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env']
           }
         },
         exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
@@ -30,7 +34,7 @@ const config = {
     new HtmlWebpackPlugin({
       cache: false,
       inject: true,
-      template:  path.resolve(__dirname, '../public/index.html'),
+      template: path.resolve(__dirname, '../public/index.html'),
     })
   ],
 }

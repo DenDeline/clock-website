@@ -1,3 +1,5 @@
+import './index.css'
+
 class LifeClock {
   private _birthday: Date = new Date('2002-08-20T00:00:00.000')
   private _maybeMaxBirthday: Date | null = null
@@ -104,9 +106,6 @@ function main() {
 
   const lifeClock = new LifeClock(timerNode)
   lifeClock.watchAnimation()
-
-  const a = new Promise(resolve => setTimeout(resolve, 1000))
-  a.then(() => console.log('done'))
 }
 
 main()

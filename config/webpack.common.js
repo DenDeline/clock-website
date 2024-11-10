@@ -109,8 +109,8 @@ module.exports = /** @type { import('webpack').Configuration } */ (webpackEnv, a
       },
     },
     output: {
-      filename: 'bundle.js',
       path: path.resolve(__dirname, '../dist'),
+      assetModuleFilename: 'static/media/[name].[hash][ext]',
     },
     plugins: [
       new HtmlWebpackPlugin({

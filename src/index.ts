@@ -1,6 +1,12 @@
 import './index.css'
 
-import { addYearsToDate, formatClockValue } from '@/utils'
+import { addYearsToDate, formatClockValue, easings } from '@/utils'
+
+const timeConstants = {
+  hoursInDay: 24,
+  minutesInHour: 60,
+  secondsInMinute: 60,
+}
 
 class LifeClock {
   private _birthday: Date = new Date('2002-08-20T00:00:00.000')
@@ -62,18 +68,15 @@ class LifeClock {
     const days = Math.trunc(daysRaw)
     const daysFractional = daysRaw - days
 
-    const hoursInDay = 24
-    const hoursRaw = daysFractional * hoursInDay
+    const hoursRaw = daysFractional * timeConstants.hoursInDay
     const hours = Math.trunc(hoursRaw)
     const hoursFractional = hoursRaw - hours
 
-    const minutesInHour = 60
-    const minutesRaw = hoursFractional * minutesInHour
+    const minutesRaw = hoursFractional * timeConstants.minutesInHour
     const minutes = Math.trunc(minutesRaw)
     const minutesFractional = minutesRaw - minutes
 
-    const secondsInMinute = 60
-    const secondsRaw = minutesFractional * secondsInMinute
+    const secondsRaw = minutesFractional * timeConstants.secondsInMinute
     const seconds = Math.trunc(secondsRaw)
     const secondsFractional = secondsRaw - seconds
 
@@ -112,19 +115,7 @@ function main() {
   const lifePercentage = lifeClock.getLifePercentage()
 
   let zero: number | null = null
-  const durationMs = 60000
-
-  const bezeir = (t: number) => {
-    return t * t * (3.0 - 2.0 * t)
-  }
-
-  const inOutQuadBlend = (t: number) => {
-    if (t <= 0.5) {
-      return 2.0 * t * t
-    }
-    t -= 0.5
-    return 2.0 * t * (1.0 - t) + 0.5
-  }
+  const durationMs = 5000
 
   const watchAppearAnimation: FrameRequestCallback = (timestamp: number) => {
     if (!zero) {
@@ -138,7 +129,7 @@ function main() {
 
     const pers = elapsedMs / durationMs
 
-    const { hours, minutes } = LifeClock.getTime(lifePercentage * inOutQuadBlend(pers))
+    const { hours, minutes } = LifeClock.getTime(lifePercentage * easings.easeInOutCubic(pers))
     timerNode.innerHTML = formatClockValue(hours) + ':' + formatClockValue(minutes)
 
     requestAnimationFrame(watchAppearAnimation)

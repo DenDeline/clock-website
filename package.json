@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "webpack serve --config ./config/webpack.dev.js",
-    "build": "webpack --config ./config/webpack.prod.js",
+    "build": "webpack --config ./config/webpack.prod.js --node-env=production",
     "prepare": "husky"
   },
   "repository": {
@@ -27,6 +27,12 @@
     "html-webpack-plugin": "^5.6.3",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
+    "mini-css-extract-plugin": "^2.9.2",
+    "postcss": "^8.4.47",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-loader": "^8.1.1",
+    "postcss-normalize": "^13.0.1",
+    "postcss-preset-env": "^10.0.9",
     "prettier": "^3.3.3",
     "style-loader": "^4.0.0",
     "typescript": "^5.6.3",

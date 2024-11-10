@@ -52,9 +52,12 @@ class LifeClock {
     return (Date.now() - this.birthday.valueOf()) / this.meanLifeDurationMs
   }
 
-  public getTime() {
+  public getCurrentTime() {
     const lifePercentage = this.getLifePercentage()
+    return LifeClock.getTime(lifePercentage)
+  }
 
+  public static getTime(lifePercentage: number) {
     const daysRaw = lifePercentage
     const days = Math.trunc(daysRaw)
     const daysFractional = daysRaw - days
@@ -106,8 +109,45 @@ function main() {
 
   const lifeClock = new LifeClock()
 
+  const lifePercentage = lifeClock.getLifePercentage()
+
+  let zero: number | null = null
+  const durationMs = 60000
+
+  const bezeir = (t: number) => {
+    return t * t * (3.0 - 2.0 * t)
+  }
+
+  const inOutQuadBlend = (t: number) => {
+    if (t <= 0.5) {
+      return 2.0 * t * t
+    }
+    t -= 0.5
+    return 2.0 * t * (1.0 - t) + 0.5
+  }
+
+  const watchAppearAnimation: FrameRequestCallback = (timestamp: number) => {
+    if (!zero) {
+      zero = timestamp
+    }
+
+    const elapsedMs = timestamp - zero
+    if (elapsedMs > durationMs) {
+      return
+    }
+
+    const pers = elapsedMs / durationMs
+
+    const { hours, minutes } = LifeClock.getTime(lifePercentage * inOutQuadBlend(pers))
+    timerNode.innerHTML = formatClockValue(hours) + ':' + formatClockValue(minutes)
+
+    requestAnimationFrame(watchAppearAnimation)
+  }
+
+  requestAnimationFrame(watchAppearAnimation)
+
   const watchAnimation = (displayDots = true) => {
-    const { hours, minutes } = lifeClock.getTime()
+    const { hours, minutes } = lifeClock.getCurrentTime()
     const separator = `<span style="visibility: ${displayDots ? 'visible' : 'hidden'}">:</span>`
 
     timerNode.innerHTML = formatClockValue(hours) + separator + formatClockValue(minutes)

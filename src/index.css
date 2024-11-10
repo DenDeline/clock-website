@@ -12,6 +12,26 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background-color: var(--bg-color);
   color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+body::backdrop {
+  background-color: var(--bg-color);
+}
+
+.timer {
+}
+
+.timer__text {
+  font-weight: 700;
+  font-size: 95px;
+  font-family: monospace;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

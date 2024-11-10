@@ -20,10 +20,10 @@ body::backdrop {
   background-color: var(--bg-color);
 }
 
-.timer {
+.clock {
 }
 
-.timer__text {
+.clock__text {
   font-weight: 700;
   font-size: 95px;
   font-family: monospace;

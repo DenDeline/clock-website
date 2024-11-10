@@ -43,13 +43,13 @@ class LifeClock {
     return this._meanDeathDay
   }
 
-  public calculateLifeDelta(fraction = 1): number {
-    return fraction * (this.meanDeathDay.valueOf() - this.birthday.valueOf())
+  public static getLifeDurationMs(birthDate: Date, deathDate: Date, lifePercentage = 1): number {
+    return lifePercentage * (deathDate.getTime() - birthDate.getTime())
   }
 
   public get meanLifeDurationMs(): number {
     if (!this._meanLifeDurationMs) {
-      this._meanLifeDurationMs = this.calculateLifeDelta()
+      this._meanLifeDurationMs = LifeClock.getLifeDurationMs(this.birthday, this.meanDeathDay)
     }
     return this._meanLifeDurationMs
   }
@@ -96,10 +96,12 @@ class LifeClock {
     }
   }
 
+  public static getAge(meanDeathAge: number, lifePercentage: number) {
+    return Math.trunc(meanDeathAge * lifePercentage)
+  }
+
   public getAge() {
-    const ageDifMs = Date.now() - this.birthday.valueOf()
-    const ageDate = new Date(ageDifMs)
-    return Math.abs(ageDate.getUTCFullYear() - 1970)
+    return LifeClock.getAge(this.meanDeathAge, this.getLifePercentage())
   }
 }
 
@@ -127,10 +129,13 @@ function main() {
       return
     }
 
-    const pers = elapsedMs / durationMs
+    const persAnimation = elapsedMs / durationMs
 
-    const { hours, minutes } = LifeClock.getTime(lifePercentage * easings.easeInOutExpo(pers))
-    timerNode.innerHTML = formatClockValue(hours) + ':' + formatClockValue(minutes)
+    const lifePercentageAnimation = lifePercentage * easings.easeInOutExpo(persAnimation)
+    const { hours, minutes } = LifeClock.getTime(lifePercentageAnimation)
+    const age = LifeClock.getAge(lifeClock.meanDeathAge, lifePercentageAnimation)
+
+    timerNode.innerHTML = formatClockValue(hours) + ':' + formatClockValue(minutes) + ' ' + age
 
     requestAnimationFrame(watchAppearAnimation)
   }
@@ -139,9 +144,11 @@ function main() {
 
   const watchAnimation = (displayDots = true) => {
     const { hours, minutes } = lifeClock.getCurrentTime()
+    const age = lifeClock.getAge()
+
     const separator = `<span style="visibility: ${displayDots ? 'visible' : 'hidden'}">:</span>`
 
-    timerNode.innerHTML = formatClockValue(hours) + separator + formatClockValue(minutes)
+    timerNode.innerHTML = formatClockValue(hours) + separator + formatClockValue(minutes) + ' ' + age
     setTimeout(() => watchAnimation(!displayDots), 1000)
   }
 

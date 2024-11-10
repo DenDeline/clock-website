@@ -115,7 +115,7 @@ function main() {
   const lifePercentage = lifeClock.getLifePercentage()
 
   let zero: number | null = null
-  const durationMs = 5000
+  const durationMs = 10000
 
   const watchAppearAnimation: FrameRequestCallback = (timestamp: number) => {
     if (!zero) {
@@ -129,7 +129,7 @@ function main() {
 
     const pers = elapsedMs / durationMs
 
-    const { hours, minutes } = LifeClock.getTime(lifePercentage * easings.easeInOutCubic(pers))
+    const { hours, minutes } = LifeClock.getTime(lifePercentage * easings.easeInOutExpo(pers))
     timerNode.innerHTML = formatClockValue(hours) + ':' + formatClockValue(minutes)
 
     requestAnimationFrame(watchAppearAnimation)

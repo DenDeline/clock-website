@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import moment, { Moment } from 'moment'
 
 import {
@@ -23,34 +23,47 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { Clock } from '@/components'
 
 export default function Home() {
-  const [birthday, setBirthday] = useState<Moment | null>(() => {
-    const rawBirthday = window.localStorage.getItem('birthday')
-    if (rawBirthday) {
-      return moment(rawBirthday)
-    }
-    return null
-  })
-
-  const [meanDeathAge, setMeanDeathAge] = useState<number>(() => {
-    const rawMeanDeathAge = window.localStorage.getItem('meanDeathAge')
-    if (rawMeanDeathAge) {
-      return Number(rawMeanDeathAge)
-    }
-    return 76
-  })
+  const [birthday, setBirthday] = useState<Moment | null>(null)
+  const [meanDeathAge, setMeanDeathAge] = useState<number>(76)
 
   const dialogTitle = birthday ? 'Settings' : 'Welcome'
-  const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(() => !birthday)
-  const [configBirthday, setConfigBirthday] = useState<Moment | null>(() => birthday)
-  const [configMeanDeathAge, setConfigMeanDeathAge] = useState<string>(() => meanDeathAge.toString())
+  const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
+  const [configBirthday, setConfigBirthday] = useState<Moment | null>(null)
+  const [configMeanDeathAge, setConfigMeanDeathAge] = useState<string>('')
+
+  useEffect(() => {
+    const rawConfig = window.localStorage.getItem('config')
+    if (!rawConfig) {
+      setIsConfigDialogOpen(true)
+      return
+    }
+
+    const config = JSON.parse(rawConfig)
+    if (config?.birthday && config.meanDeathAge) {
+      setBirthday(moment(config.birthday))
+      setMeanDeathAge(Number(config.meanDeathAge))
+    } else {
+      setIsConfigDialogOpen(true)
+    }
+  }, [])
+
+  const handleDialogEnter = useCallback(() => {
+    setConfigBirthday(birthday)
+    setConfigMeanDeathAge(meanDeathAge.toString())
+  }, [birthday, meanDeathAge])
 
   const handleConfigSubmit = useCallback(() => {
     setIsConfigDialogOpen(false)
 
-    localStorage.setItem('birthday', configBirthday!.format('YYYY-MM-DD'))
     setBirthday(configBirthday)
-    localStorage.setItem('meanDeathAge', configMeanDeathAge!.toString())
     setMeanDeathAge(Number(configMeanDeathAge))
+
+    const config = {
+      birthday: configBirthday!.format('YYYY-MM-DD'),
+      meanDeathAge: configMeanDeathAge!.toString(),
+    }
+
+    window.localStorage.setItem('config', JSON.stringify(config))
   }, [configBirthday, configMeanDeathAge])
 
   return (
@@ -69,7 +82,7 @@ export default function Home() {
       <Grid2 container height='100vh' justifyContent='center' alignItems='center'>
         {birthday && <Clock birthday={birthday} meanDeathAge={meanDeathAge} />}
       </Grid2>
-      <Dialog open={isConfigDialogOpen}>
+      <Dialog open={isConfigDialogOpen} TransitionProps={{ onEnter: handleDialogEnter }}>
         <DialogTitle>{dialogTitle}</DialogTitle>
         <DialogContent>
           <DialogContentText>Enter your birthday</DialogContentText>

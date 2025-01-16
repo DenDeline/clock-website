@@ -39,6 +39,7 @@ export default function Home() {
     return 76
   })
 
+  const dialogTitle = birthday ? 'Settings' : 'Welcome'
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(() => !birthday)
   const [configBirthday, setConfigBirthday] = useState<Moment | null>(() => birthday)
   const [configMeanDeathAge, setConfigMeanDeathAge] = useState<string>(() => meanDeathAge.toString())
@@ -55,7 +56,7 @@ export default function Home() {
   return (
     <LocalizationProvider dateAdapter={AdapterMoment}>
       <Fab
-        color='primary'
+        size='small'
         sx={{
           position: 'absolute',
           bottom: 16,
@@ -69,7 +70,7 @@ export default function Home() {
         {birthday && <Clock birthday={birthday} meanDeathAge={meanDeathAge} />}
       </Grid2>
       <Dialog open={isConfigDialogOpen}>
-        <DialogTitle>Welcome</DialogTitle>
+        <DialogTitle>{dialogTitle}</DialogTitle>
         <DialogContent>
           <DialogContentText>Enter your birthday</DialogContentText>
           <DateField
@@ -90,10 +91,11 @@ export default function Home() {
             value={configMeanDeathAge}
             onChange={(e) => setConfigMeanDeathAge(e.target.value)}
             margin='dense'
+            fullWidth
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleConfigSubmit}>Ok</Button>
+          <Button onClick={handleConfigSubmit}>Save</Button>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>

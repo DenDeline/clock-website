@@ -27,7 +27,6 @@ export default function Home() {
   const [birthday, setBirthday] = useState<Moment | null>(null)
   const [meanDeathAge, setMeanDeathAge] = useState<number>(76)
 
-  const dialogTitle = birthday ? 'Settings' : 'Welcome'
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [configBirthday, setConfigBirthday] = useState<Moment | null>(null)
   const [configMeanDeathAge, setConfigMeanDeathAge] = useState<string>('')
@@ -84,7 +83,7 @@ export default function Home() {
         {birthday && <Clock birthday={birthday} meanDeathAge={meanDeathAge} />}
       </Grid2>
       <Dialog open={isConfigDialogOpen} TransitionProps={{ onEnter: handleDialogEnter }}>
-        <DialogTitle>{dialogTitle}</DialogTitle>
+        <DialogTitle>Welcome</DialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>
             Visualize your life&apos;s journey through a unique 24-hour perspective. By providing your details, you can

@@ -4,15 +4,16 @@ import { useCallback, useEffect, useState } from 'react'
 import moment, { Moment } from 'moment'
 
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Fab,
   Grid2,
   TextField,
+  Typography,
 } from '@mui/material'
 
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -84,8 +85,11 @@ export default function Home() {
       </Grid2>
       <Dialog open={isConfigDialogOpen} TransitionProps={{ onEnter: handleDialogEnter }}>
         <DialogTitle>{dialogTitle}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Enter your birthday</DialogContentText>
+        <DialogContent dividers>
+          <Typography gutterBottom>
+            Visualize your life&apos;s journey through a unique 24-hour perspective. By providing your details, you can
+            see how your day represents your life, motivating you to make every moment count
+          </Typography>
           <DateField
             required
             label='Birthday'
@@ -94,7 +98,7 @@ export default function Home() {
             onChange={setConfigBirthday}
             margin='dense'
             fullWidth
-            autoFocus
+            format='DD/MM/YYYY'
           />
           <TextField
             required
@@ -105,7 +109,12 @@ export default function Home() {
             onChange={(e) => setConfigMeanDeathAge(e.target.value)}
             margin='dense'
             fullWidth
+            sx={{ mb: 2 }}
           />
+          <Alert severity='info'>
+            We use your birthday to calculate how far you are along your life&apos;s clock. The mean lifespan helps us
+            estimate the full 24-hour cycle. This information is only stored on your device and is not shared.
+          </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleConfigSubmit}>Save</Button>

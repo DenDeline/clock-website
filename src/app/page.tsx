@@ -79,7 +79,7 @@ export default function Home() {
       >
         <SettingsIcon />
       </Fab>
-      <Grid2 container height='100vh' justifyContent='center' alignItems='center'>
+      <Grid2 container height='100dvh' justifyContent='center' alignItems='center'>
         {birthday && <Clock birthday={birthday} meanDeathAge={meanDeathAge} />}
       </Grid2>
       <Dialog open={isConfigDialogOpen} TransitionProps={{ onEnter: handleDialogEnter }}>

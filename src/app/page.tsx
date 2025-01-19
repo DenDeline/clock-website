@@ -116,10 +116,7 @@ export default function Home() {
       >
         <DialogTitle>Welcome</DialogTitle>
         <DialogContent dividers>
-          <Typography gutterBottom>
-            Visualize your life&apos;s journey through a unique 24-hour perspective. By providing your details, you can
-            see how your day represents your life, motivating you to make every moment count
-          </Typography>
+          <Typography gutterBottom>Visualize your life&apos;s journey through a unique 24-hour perspective.</Typography>
           <Controller
             name='birthday'
             control={control}
@@ -161,7 +158,6 @@ export default function Home() {
               />
             )}
           />
-
           <Alert severity='info'>
             We use your birthday to calculate how far you are along your life&apos;s clock. The mean lifespan helps us
             estimate the full 24-hour cycle. This information is only stored on your device and is not shared.

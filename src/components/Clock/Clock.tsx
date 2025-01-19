@@ -47,6 +47,7 @@ const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
   )
 
   const [lifePercentage, setLifePercentage] = useState(getLifePercentage)
+  const [displayDots, setDisplayDots] = useState(true)
 
   const { hours, minutes } = getTime(lifePercentage)
   const clockHours = formatClockValue(hours)
@@ -58,6 +59,7 @@ const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
 
     intervalRef.current = window.setInterval(() => {
       setLifePercentage(getLifePercentage())
+      setDisplayDots((v) => !v)
     }, 1000)
 
     return () => {
@@ -67,7 +69,9 @@ const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
 
   return (
     <Typography variant='h1' fontWeight={700}>
-      <span>{clockHours}</span>:<span>{clockMinutes}</span>
+      <span>{clockHours}</span>
+      <span style={{ visibility: displayDots ? 'visible' : 'hidden' }}>:</span>
+      <span>{clockMinutes}</span>
     </Typography>
   )
 }

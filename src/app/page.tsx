@@ -5,7 +5,7 @@ import dayjs, { type Dayjs } from 'dayjs'
 
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 
 import {
   Alert,

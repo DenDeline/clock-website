@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Typography } from '@mui/material'
 
-import moment, { Moment } from 'moment'
+import dayjs, { Dayjs } from 'dayjs'
 
 import { formatClockValue } from '@/utils'
 
@@ -33,16 +33,16 @@ function getTime(lifePercentage: number) {
 }
 
 interface ClockProps {
-  birthday: Moment
+  birthday: Dayjs
   meanDeathAge: number
 }
 
 const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
-  const meanDeathDay = useMemo(() => moment(birthday).add(meanDeathAge, 'y'), [birthday, meanDeathAge])
+  const meanDeathDay = useMemo(() => dayjs(birthday).add(meanDeathAge, 'y'), [birthday, meanDeathAge])
   const meanLifeDurationMs = useMemo(() => meanDeathDay.diff(birthday), [birthday, meanDeathDay])
 
   const getLifePercentage = useCallback(
-    () => moment().diff(birthday) / meanLifeDurationMs,
+    () => dayjs().diff(birthday) / meanLifeDurationMs,
     [birthday, meanLifeDurationMs],
   )
 

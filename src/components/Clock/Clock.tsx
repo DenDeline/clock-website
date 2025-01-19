@@ -38,8 +38,10 @@ interface ClockProps {
 }
 
 const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
-  const meanDeathDay = useMemo(() => dayjs(birthday).add(meanDeathAge, 'y'), [birthday, meanDeathAge])
-  const meanLifeDurationMs = useMemo(() => meanDeathDay.diff(birthday), [birthday, meanDeathDay])
+  const meanLifeDurationMs = useMemo(() => {
+    const meanDeathDay = dayjs(birthday).add(meanDeathAge, 'y')
+    return meanDeathDay.diff(birthday)
+  }, [birthday, meanDeathAge])
 
   const getLifePercentage = useCallback(
     () => dayjs().diff(birthday) / meanLifeDurationMs,

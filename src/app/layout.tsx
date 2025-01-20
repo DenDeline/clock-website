@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 
 import { Roboto } from 'next/font/google'
+
+import theme from '@/theme'
+import { getAppUrl } from '@/utils/urls'
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -12,9 +16,8 @@ const roboto = Roboto({
   variable: '--font-roboto',
 })
 
-import theme from '@/app/theme'
-
 export const metadata: Metadata = {
+  metadataBase: getAppUrl(),
   title: 'Life clock',
   description: 'See your mean lifespan like a clock',
   openGraph: {
@@ -32,8 +35,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const isProduction = process.env.NODE_ENV === 'production'
+
   return (
-    <html lang='en'>
+    <html lang='en' prefix='og: https://ogp.me/ns#'>
       <body className={roboto.variable}>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
@@ -42,6 +47,7 @@ export default function RootLayout({
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
+      {isProduction && <GoogleAnalytics gaId='G-1DG80KJHZQ' />}
     </html>
   )
 }

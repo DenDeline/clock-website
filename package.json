@@ -17,6 +17,7 @@
     "@mui/material": "^6.3.1",
     "@mui/material-nextjs": "^6.3.1",
     "@mui/x-date-pickers": "^7.23.6",
+    "@next/third-parties": "^15.1.5",
     "dayjs": "^1.11.13",
     "next": "15.1.4",
     "react": "19.0.0",

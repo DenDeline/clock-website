@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import dayjs, { type Dayjs } from 'dayjs'
 
 import { z } from 'zod'
@@ -46,6 +46,7 @@ const schema = z.object({
 type FormSchema = z.infer<typeof schema>
 
 export default function Home() {
+  const [isInitialized, setIsInitialized] = useState(false)
   const [birthday, setBirthday] = useState<Dayjs | null>(null)
   const [meanDeathAge, setMeanDeathAge] = useState<number>(76)
 
@@ -71,6 +72,8 @@ export default function Home() {
         meanDeathAge: result.meanDeathAge,
         birthday: result.birthday,
       })
+
+      setIsInitialized(true)
     } catch {
       window.localStorage.removeItem('config')
       setIsConfigDialogOpen(true)
@@ -89,6 +92,14 @@ export default function Home() {
     setMeanDeathAge(data.meanDeathAge)
     setIsConfigDialogOpen(false)
   }
+
+  const handleDialogExited = useCallback(() => {
+    setIsInitialized(true)
+    reset({
+      birthday: birthday!,
+      meanDeathAge,
+    })
+  }, [birthday, meanDeathAge, reset])
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -113,8 +124,12 @@ export default function Home() {
           component: 'form',
           noValidate: 'novalidate',
         }}
+        TransitionProps={{
+          onExited: handleDialogExited,
+        }}
+        onClose={isInitialized ? () => setIsConfigDialogOpen(false) : undefined}
       >
-        <DialogTitle>Welcome</DialogTitle>
+        <DialogTitle>{isInitialized ? 'Settings' : 'Welcome'}</DialogTitle>
         <DialogContent dividers>
           <Typography gutterBottom>Visualize your life&apos;s journey through a unique 24-hour perspective.</Typography>
           <Controller
@@ -131,6 +146,7 @@ export default function Home() {
                 fullWidth
                 format='DD/MM/YYYY'
                 disableFuture
+                autoFocus
                 slotProps={{
                   textField: {
                     error: !!error,
@@ -164,6 +180,7 @@ export default function Home() {
           </Alert>
         </DialogContent>
         <DialogActions>
+          {isInitialized && <Button onClick={() => setIsConfigDialogOpen(false)}>Close</Button>}
           <Button type='submit'>Save</Button>
         </DialogActions>
       </Dialog>

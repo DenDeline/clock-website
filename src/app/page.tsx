@@ -104,6 +104,7 @@ export default function Home() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Fab
+        aria-label='settings'
         size='small'
         sx={{
           position: 'absolute',

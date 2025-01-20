@@ -29,7 +29,7 @@ import { Clock } from '@/components'
 
 const schema = z.object({
   birthday: z
-    .union([z.custom<Dayjs>(dayjs.isDayjs, { message: 'Invalid date' }), z.string().transform(dayjs)])
+    .union([z.custom<Dayjs>(dayjs.isDayjs, 'Birthday must not be empty'), z.string().transform(dayjs)])
     .refine((val) => val.isValid(), { message: 'Invalid date' })
     .refine((val) => val.isBefore(dayjs(), 'd'), { message: 'Too young!' }),
   meanDeathAge: z.coerce
@@ -37,9 +37,8 @@ const schema = z.object({
     .positive({
       message: 'Mean death age must be greater than 0',
     })
-    .finite()
-    .safe({
-      message: 'Mean death age must be less than or equal to 9007199254740991',
+    .max(dayjs().year(), {
+      message: 'Hello, Jesus. How are you doing today?',
     }),
 })
 

@@ -147,7 +147,7 @@ export default function Home() {
                 fullWidth
                 format='DD/MM/YYYY'
                 disableFuture
-                autoFocus
+                autoFocus={!isInitialized}
                 slotProps={{
                   textField: {
                     error: !!error,

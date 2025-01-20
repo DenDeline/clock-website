@@ -17,6 +17,14 @@ import theme from '@/app/theme'
 export const metadata: Metadata = {
   title: 'Life clock',
   description: 'See your mean lifespan like a clock',
+  openGraph: {
+    siteName: 'Life clock',
+    title: "Life clock - DenDeline's Pages",
+    description: 'See your mean lifespan like a clock',
+    locale: 'en_US',
+    type: 'website',
+    url: '/',
+  },
 }
 
 export default function RootLayout({

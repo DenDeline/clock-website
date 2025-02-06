@@ -1,43 +1,16 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { convertPercentageToTime, formatClockValue } from '@/utils/clock'
 import { Typography } from '@mui/material'
-
 import dayjs, { type Dayjs } from 'dayjs'
-
-import { formatClockValue } from '@/utils'
-
-const timeConstants = {
-  hoursInDay: 24,
-  minutesInHour: 60,
-  secondsInMinute: 60,
-}
-
-function getTime(lifePercentage: number) {
-  const daysRaw = lifePercentage
-  const days = Math.trunc(daysRaw)
-  const daysFractional = daysRaw - days
-
-  const hoursRaw = daysFractional * timeConstants.hoursInDay
-  const hours = Math.trunc(hoursRaw)
-  const hoursFractional = hoursRaw - hours
-
-  const minutesRaw = hoursFractional * timeConstants.minutesInHour
-  const minutes = Math.trunc(minutesRaw)
-
-  return {
-    days,
-    hours,
-    minutes,
-  }
-}
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 interface ClockProps {
   birthday: Dayjs
   meanDeathAge: number
 }
 
-const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
+function Clock({ birthday, meanDeathAge }: ClockProps) {
   const meanLifeDurationMs = useMemo(() => {
     const meanDeathDay = dayjs(birthday).add(meanDeathAge, 'y')
     return meanDeathDay.diff(birthday)
@@ -51,7 +24,7 @@ const Clock: React.FC<ClockProps> = ({ birthday, meanDeathAge }) => {
   const [lifePercentage, setLifePercentage] = useState(getLifePercentage)
   const [displayDots, setDisplayDots] = useState(true)
 
-  const { hours, minutes } = getTime(lifePercentage)
+  const { hours, minutes } = convertPercentageToTime(lifePercentage)
   const clockHours = formatClockValue(hours)
   const clockMinutes = formatClockValue(minutes)
 

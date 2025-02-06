@@ -9,17 +9,22 @@ import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 
 import {
   Alert,
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Fab,
+  Fade,
   Grid2,
+  IconButton,
+  Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
-
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import SettingsIcon from '@mui/icons-material/Settings'
 
 import { DateField } from '@mui/x-date-pickers'
@@ -52,6 +57,7 @@ export default function Home() {
   const [meanDeathAge, setMeanDeathAge] = useState<number>(76)
 
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
+  const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
 
   const { control, handleSubmit, reset } = useForm<FormSchema>({
     resolver: zodResolver(schema),
@@ -104,18 +110,48 @@ export default function Home() {
 
   return (
     <>
-      <Fab
-        aria-label='settings'
-        size='small'
+      <Box
         sx={{
           position: 'absolute',
           bottom: 16,
           right: 16,
         }}
-        onClick={() => setIsConfigDialogOpen(true)}
       >
-        <SettingsIcon />
-      </Fab>
+        <Stack spacing={1}>
+          <Fade in={isInterfaceVisible} appear={false}>
+            <Tooltip
+              title={'Settings'}
+              placement='left'
+              arrow
+              enterDelay={200}
+              enterNextDelay={200}
+            >
+              <IconButton
+                size='small'
+                onClick={() => setIsConfigDialogOpen(true)}
+              >
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+          </Fade>
+          <Tooltip
+            title={isInterfaceVisible ? 'Hide interface' : 'Show interface'}
+            placement='left'
+            arrow
+            enterDelay={200}
+            enterNextDelay={200}
+          >
+            <IconButton
+              aria-label='settings'
+              size='small'
+              onClick={() => setIsInterfaceVisible((v) => !v)}
+            >
+              {isInterfaceVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      </Box>
+
       <Grid2
         container
         height='100dvh'

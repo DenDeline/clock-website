@@ -31,7 +31,7 @@ import {
 
 import { DateField } from '@mui/x-date-pickers'
 import dayjs, { type Dayjs } from 'dayjs'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 
 import { z } from 'zod'
@@ -41,32 +41,26 @@ type ClockDeathInputVariantEnum = z.infer<typeof ClockDeathInputVariantEnum>
 
 const formSchema = z
   .object({
-    birthday: z
+    startDate: z
       .union([
-        z.custom<Dayjs>(dayjs.isDayjs, 'Birthday must not be empty'),
+        z.custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty'),
         z.string().transform(dayjs),
       ])
-      .refine((val) => val.isValid(), { message: 'Invalid date' })
-      .refine((val) => val.isBefore(dayjs(), 'd'), { message: 'Too young!' }),
+      .refine((val) => val.isValid(), { message: 'Invalid date' }),
   })
   .and(
     z.discriminatedUnion('variant', [
       z.object({
         variant: ClockDeathInputVariantEnum.extract(['age']),
-        meanDeathAge: z.coerce
-          .number()
-          .positive({
-            message: 'Mean death age must be greater than 0',
-          })
-          .max(dayjs().year(), {
-            message: 'Hello, Jesus. How are you doing today?',
-          }),
+        deadlineYears: z.coerce.number().positive({
+          message: 'Deadline years must be greater than 0',
+        }),
       }),
       z.object({
         variant: ClockDeathInputVariantEnum.extract(['date']),
-        meanDeathDate: z.custom<Dayjs>(
+        deadlineDate: z.custom<Dayjs>(
           dayjs.isDayjs,
-          'Birthday must not be empty',
+          'Deadline date must not be empty',
         ),
       }),
     ]),
@@ -76,23 +70,22 @@ type FormSchema = z.infer<typeof formSchema>
 
 const configSchema = z.object({
   variant: ClockDeathInputVariantEnum,
-  birthday: z
+  startDate: z
     .union([
-      z.custom<Dayjs>(dayjs.isDayjs, 'Birthday must not be empty'),
+      z.custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty'),
       z.string().transform(dayjs),
     ])
-    .refine((val) => val.isValid(), { message: 'Invalid date' })
-    .refine((val) => val.isBefore(dayjs(), 'd'), { message: 'Too young!' }),
+    .refine((val) => val.isValid(), { message: 'Invalid date' }),
   durationMs: z.coerce.number(),
 })
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false)
 
-  const [inputVariant, setInputVariant] = useState<ClockDeathInputVariantEnum>(
-    ClockDeathInputVariantEnum.enum.age,
-  )
-  const [birthday, setBirthday] = useState<Dayjs | null>(null)
+  const [deadlineInputVariant, setDeadlineInputVariant] =
+    useState<ClockDeathInputVariantEnum>(ClockDeathInputVariantEnum.enum.age)
+  const deadlineInputVariantControlId = useId()
+  const [startDate, setStartDate] = useState<Dayjs | null>(null)
   const [durationMs, setDurationMs] = useState<number>(0)
 
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
@@ -101,10 +94,10 @@ export default function Home() {
   const { control, handleSubmit, reset, resetField } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      variant: inputVariant,
-      birthday: birthday!,
-      meanDeathAge: 76,
-      meanDeathDate: null!,
+      variant: deadlineInputVariant,
+      startDate: startDate!,
+      deadlineYears: 76,
+      deadlineDate: null!,
     },
   })
 
@@ -113,17 +106,17 @@ export default function Home() {
       const config = JSON.parse(window.localStorage.getItem('config') || '{}')
       const result = configSchema.parse(config)
 
-      setBirthday(result.birthday)
-      setInputVariant(result.variant)
+      setStartDate(result.startDate)
+      setDeadlineInputVariant(result.variant)
       setDurationMs(result.durationMs)
 
-      const meanDeathDate = result.birthday.add(result.durationMs)
+      const deadlineDate = result.startDate.add(result.durationMs)
 
       reset({
         variant: result.variant,
-        birthday: result.birthday,
-        meanDeathAge: meanDeathDate.diff(result.birthday, 'y'),
-        meanDeathDate: meanDeathDate,
+        startDate: result.startDate,
+        deadlineYears: deadlineDate.diff(result.startDate, 'y'),
+        deadlineDate: deadlineDate,
       })
 
       setIsInitialized(true)
@@ -136,20 +129,20 @@ export default function Home() {
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
     const newDurationMs = (
       data.variant === 'date'
-        ? data.meanDeathDate
-        : data.birthday.add(data.meanDeathAge, 'y')
-    ).diff(data.birthday)
+        ? data.deadlineDate
+        : data.startDate.add(data.deadlineYears, 'y')
+    ).diff(data.startDate)
 
     const config = {
       variant: data.variant,
-      birthday: data.birthday.format('YYYY-MM-DD'),
+      startDate: data.startDate.format('YYYY-MM-DD'),
       durationMs: newDurationMs,
     }
 
     window.localStorage.setItem('config', JSON.stringify(config))
 
-    setInputVariant(data.variant)
-    setBirthday(data.birthday)
+    setDeadlineInputVariant(data.variant)
+    setStartDate(data.startDate)
     setDurationMs(newDurationMs)
 
     setIsConfigDialogOpen(false)
@@ -157,15 +150,15 @@ export default function Home() {
 
   const handleDialogExited = useCallback(() => {
     setIsInitialized(true)
-    const meanDeathDate = birthday!.add(durationMs)
+    const deadlineDate = startDate!.add(durationMs)
 
     reset({
-      variant: inputVariant,
-      birthday: birthday!,
-      meanDeathAge: meanDeathDate.diff(birthday, 'y'),
-      meanDeathDate: meanDeathDate,
+      variant: deadlineInputVariant,
+      startDate: startDate!,
+      deadlineYears: deadlineDate.diff(startDate, 'y'),
+      deadlineDate,
     })
-  }, [birthday, durationMs, inputVariant, reset])
+  }, [startDate, durationMs, deadlineInputVariant, reset])
 
   return (
     <>
@@ -217,7 +210,7 @@ export default function Home() {
         justifyContent='center'
         alignItems='center'
       >
-        {birthday && <Clock birthday={birthday} durationMs={durationMs} />}
+        {startDate && <Clock startDate={startDate} durationMs={durationMs} />}
       </Grid2>
       <Dialog
         open={isConfigDialogOpen}
@@ -240,7 +233,7 @@ export default function Home() {
             perspective.
           </Typography>
           <Controller
-            name='birthday'
+            name='startDate'
             control={control}
             render={({
               field: { ref, ...fieldProps },
@@ -250,7 +243,7 @@ export default function Home() {
                 {...fieldProps}
                 inputRef={ref}
                 required
-                label='Birthday'
+                label='Start date'
                 variant='standard'
                 margin='dense'
                 fullWidth
@@ -272,23 +265,22 @@ export default function Home() {
             render={({ field, fieldState: { error } }) => (
               <>
                 <FormControl error={!!error} margin='dense'>
-                  <FormLabel id='demo-row-radio-buttons-group-label'>
-                    Death duration input type
+                  <FormLabel id={deadlineInputVariantControlId}>
+                    Deadline input format
                   </FormLabel>
                   <RadioGroup
                     {...field}
                     onTransitionEnd={() => {
-                      resetField('meanDeathDate')
-                      resetField('meanDeathAge')
+                      resetField('deadlineDate')
+                      resetField('deadlineYears')
                     }}
                     row
-                    aria-labelledby='demo-row-radio-buttons-group-label'
-                    name='row-radio-buttons-group'
+                    aria-labelledby={deadlineInputVariantControlId}
                   >
                     <FormControlLabel
                       value={ClockDeathInputVariantEnum.enum.age}
                       control={<Radio />}
-                      label='Age'
+                      label='Years'
                     />
                     <FormControlLabel
                       value={ClockDeathInputVariantEnum.enum.date}
@@ -301,13 +293,13 @@ export default function Home() {
                 {field.value === 'age' ? (
                   <Controller
                     key={'.01'}
-                    name={'meanDeathAge'}
+                    name={'deadlineYears'}
                     control={control}
                     render={({ field, fieldState: { error } }) => (
                       <TextField
                         {...field}
                         required
-                        label='Mean death age'
+                        label='Deadline years span'
                         variant='standard'
                         type='number'
                         margin='dense'
@@ -321,7 +313,7 @@ export default function Home() {
                 ) : (
                   <Controller
                     key={'.02'}
-                    name={'meanDeathDate'}
+                    name={'deadlineDate'}
                     control={control}
                     render={({
                       field: { ref, ...fieldProps },
@@ -331,7 +323,7 @@ export default function Home() {
                         {...fieldProps}
                         inputRef={ref}
                         required
-                        label='Mean death date'
+                        label='Deadline date'
                         variant='standard'
                         margin='dense'
                         fullWidth

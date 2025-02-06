@@ -6,14 +6,14 @@ import dayjs, { type Dayjs } from 'dayjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface ClockProps {
-  birthday: Dayjs
+  startDate: Dayjs
   durationMs: number
 }
 
-function Clock({ birthday, durationMs }: ClockProps) {
+function Clock({ startDate, durationMs }: ClockProps) {
   const getLifePercentage = useCallback(
-    () => dayjs().diff(birthday) / durationMs,
-    [birthday, durationMs],
+    () => dayjs().diff(startDate) / durationMs,
+    [startDate, durationMs],
   )
 
   const [lifePercentage, setLifePercentage] = useState(getLifePercentage)

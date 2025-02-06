@@ -3,22 +3,17 @@
 import { convertPercentageToTime, formatClockValue } from '@/utils/clock'
 import { Typography } from '@mui/material'
 import dayjs, { type Dayjs } from 'dayjs'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface ClockProps {
   birthday: Dayjs
-  meanDeathAge: number
+  durationMs: number
 }
 
-function Clock({ birthday, meanDeathAge }: ClockProps) {
-  const meanLifeDurationMs = useMemo(() => {
-    const meanDeathDay = dayjs(birthday).add(meanDeathAge, 'y')
-    return meanDeathDay.diff(birthday)
-  }, [birthday, meanDeathAge])
-
+function Clock({ birthday, durationMs }: ClockProps) {
   const getLifePercentage = useCallback(
-    () => dayjs().diff(birthday) / meanLifeDurationMs,
-    [birthday, meanLifeDurationMs],
+    () => dayjs().diff(birthday) / durationMs,
+    [birthday, durationMs],
   )
 
   const [lifePercentage, setLifePercentage] = useState(getLifePercentage)

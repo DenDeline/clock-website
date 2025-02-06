@@ -1,11 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import dayjs, { type Dayjs } from 'dayjs'
-
-import { z } from 'zod'
+import { Clock } from '@/components'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
+import SettingsIcon from '@mui/icons-material/Settings'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 import {
   Alert,
@@ -16,22 +15,67 @@ import {
   DialogContent,
   DialogTitle,
   Fade,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  FormLabel,
   Grid2,
   IconButton,
+  Radio,
+  RadioGroup,
   Stack,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import SettingsIcon from '@mui/icons-material/Settings'
 
 import { DateField } from '@mui/x-date-pickers'
+import dayjs, { type Dayjs } from 'dayjs'
+import { useCallback, useEffect, useState } from 'react'
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 
-import { Clock } from '@/components'
+import { z } from 'zod'
 
-const schema = z.object({
+const ClockDeathInputVariantEnum = z.enum(['age', 'date'])
+type ClockDeathInputVariantEnum = z.infer<typeof ClockDeathInputVariantEnum>
+
+const formSchema = z
+  .object({
+    birthday: z
+      .union([
+        z.custom<Dayjs>(dayjs.isDayjs, 'Birthday must not be empty'),
+        z.string().transform(dayjs),
+      ])
+      .refine((val) => val.isValid(), { message: 'Invalid date' })
+      .refine((val) => val.isBefore(dayjs(), 'd'), { message: 'Too young!' }),
+  })
+  .and(
+    z.discriminatedUnion('variant', [
+      z.object({
+        variant: ClockDeathInputVariantEnum.extract(['age']),
+        meanDeathAge: z.coerce
+          .number()
+          .positive({
+            message: 'Mean death age must be greater than 0',
+          })
+          .max(dayjs().year(), {
+            message: 'Hello, Jesus. How are you doing today?',
+          }),
+      }),
+      z.object({
+        variant: ClockDeathInputVariantEnum.extract(['date']),
+        meanDeathDate: z.custom<Dayjs>(
+          dayjs.isDayjs,
+          'Birthday must not be empty',
+        ),
+      }),
+    ]),
+  )
+
+type FormSchema = z.infer<typeof formSchema>
+
+const configSchema = z.object({
+  variant: ClockDeathInputVariantEnum,
   birthday: z
     .union([
       z.custom<Dayjs>(dayjs.isDayjs, 'Birthday must not be empty'),
@@ -39,45 +83,47 @@ const schema = z.object({
     ])
     .refine((val) => val.isValid(), { message: 'Invalid date' })
     .refine((val) => val.isBefore(dayjs(), 'd'), { message: 'Too young!' }),
-  meanDeathAge: z.coerce
-    .number()
-    .positive({
-      message: 'Mean death age must be greater than 0',
-    })
-    .max(dayjs().year(), {
-      message: 'Hello, Jesus. How are you doing today?',
-    }),
+  durationMs: z.coerce.number(),
 })
-
-type FormSchema = z.infer<typeof schema>
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false)
+
+  const [inputVariant, setInputVariant] = useState<ClockDeathInputVariantEnum>(
+    ClockDeathInputVariantEnum.enum.age,
+  )
   const [birthday, setBirthday] = useState<Dayjs | null>(null)
-  const [meanDeathAge, setMeanDeathAge] = useState<number>(76)
+  const [durationMs, setDurationMs] = useState<number>(0)
 
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
 
-  const { control, handleSubmit, reset } = useForm<FormSchema>({
-    resolver: zodResolver(schema),
+  const { control, handleSubmit, reset, resetField } = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      variant: inputVariant,
       birthday: birthday!,
-      meanDeathAge,
+      meanDeathAge: 76,
+      meanDeathDate: null!,
     },
   })
 
   useEffect(() => {
     try {
       const config = JSON.parse(window.localStorage.getItem('config') || '{}')
-      const result = schema.parse(config)
+      const result = configSchema.parse(config)
 
       setBirthday(result.birthday)
-      setMeanDeathAge(result.meanDeathAge)
+      setInputVariant(result.variant)
+      setDurationMs(result.durationMs)
+
+      const meanDeathDate = result.birthday.add(result.durationMs)
 
       reset({
-        meanDeathAge: result.meanDeathAge,
+        variant: result.variant,
         birthday: result.birthday,
+        meanDeathAge: meanDeathDate.diff(result.birthday, 'y'),
+        meanDeathDate: meanDeathDate,
       })
 
       setIsInitialized(true)
@@ -88,25 +134,38 @@ export default function Home() {
   }, [reset])
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
+    const newDurationMs = (
+      data.variant === 'date'
+        ? data.meanDeathDate
+        : data.birthday.add(data.meanDeathAge, 'y')
+    ).diff(data.birthday)
+
     const config = {
+      variant: data.variant,
       birthday: data.birthday.format('YYYY-MM-DD'),
-      meanDeathAge: data.meanDeathAge,
+      durationMs: newDurationMs,
     }
 
     window.localStorage.setItem('config', JSON.stringify(config))
 
+    setInputVariant(data.variant)
     setBirthday(data.birthday)
-    setMeanDeathAge(data.meanDeathAge)
+    setDurationMs(newDurationMs)
+
     setIsConfigDialogOpen(false)
   }
 
   const handleDialogExited = useCallback(() => {
     setIsInitialized(true)
+    const meanDeathDate = birthday!.add(durationMs)
+
     reset({
+      variant: inputVariant,
       birthday: birthday!,
-      meanDeathAge,
+      meanDeathAge: meanDeathDate.diff(birthday, 'y'),
+      meanDeathDate: meanDeathDate,
     })
-  }, [birthday, meanDeathAge, reset])
+  }, [birthday, durationMs, inputVariant, reset])
 
   return (
     <>
@@ -158,7 +217,7 @@ export default function Home() {
         justifyContent='center'
         alignItems='center'
       >
-        {birthday && <Clock birthday={birthday} meanDeathAge={meanDeathAge} />}
+        {birthday && <Clock birthday={birthday} durationMs={durationMs} />}
       </Grid2>
       <Dialog
         open={isConfigDialogOpen}
@@ -208,21 +267,87 @@ export default function Home() {
             )}
           />
           <Controller
-            name='meanDeathAge'
             control={control}
+            name='variant'
             render={({ field, fieldState: { error } }) => (
-              <TextField
-                {...field}
-                required
-                label='Mean death age'
-                variant='standard'
-                type='number'
-                margin='dense'
-                fullWidth
-                sx={{ mb: 2 }}
-                error={!!error}
-                helperText={error?.message}
-              />
+              <>
+                <FormControl error={!!error} margin='dense'>
+                  <FormLabel id='demo-row-radio-buttons-group-label'>
+                    Death duration input type
+                  </FormLabel>
+                  <RadioGroup
+                    {...field}
+                    onTransitionEnd={() => {
+                      resetField('meanDeathDate')
+                      resetField('meanDeathAge')
+                    }}
+                    row
+                    aria-labelledby='demo-row-radio-buttons-group-label'
+                    name='row-radio-buttons-group'
+                  >
+                    <FormControlLabel
+                      value={ClockDeathInputVariantEnum.enum.age}
+                      control={<Radio />}
+                      label='Age'
+                    />
+                    <FormControlLabel
+                      value={ClockDeathInputVariantEnum.enum.date}
+                      control={<Radio />}
+                      label='Date'
+                    />
+                  </RadioGroup>
+                  <FormHelperText>{error?.message}</FormHelperText>
+                </FormControl>
+                {field.value === 'age' ? (
+                  <Controller
+                    key={'.01'}
+                    name={'meanDeathAge'}
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <TextField
+                        {...field}
+                        required
+                        label='Mean death age'
+                        variant='standard'
+                        type='number'
+                        margin='dense'
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        error={!!error}
+                        helperText={error?.message}
+                      />
+                    )}
+                  />
+                ) : (
+                  <Controller
+                    key={'.02'}
+                    name={'meanDeathDate'}
+                    control={control}
+                    render={({
+                      field: { ref, ...fieldProps },
+                      fieldState: { error },
+                    }) => (
+                      <DateField
+                        {...fieldProps}
+                        inputRef={ref}
+                        required
+                        label='Mean death date'
+                        variant='standard'
+                        margin='dense'
+                        fullWidth
+                        sx={{ mb: 2 }}
+                        format='DD/MM/YYYY'
+                        slotProps={{
+                          textField: {
+                            error: !!error,
+                            helperText: error?.message,
+                          },
+                        }}
+                      />
+                    )}
+                  />
+                )}
+              </>
             )}
           />
           <Alert severity='info'>

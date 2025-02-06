@@ -8,6 +8,7 @@ import { Roboto } from 'next/font/google'
 
 import theme from '@/theme'
 import { getAppUrl } from '@/utils/urls'
+import Providers from './providers'
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -41,10 +42,12 @@ export default function RootLayout({
     <html lang='en' prefix='og: https://ogp.me/ns#'>
       <body className={roboto.variable}>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-          </ThemeProvider>
+          <Providers>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              {children}
+            </ThemeProvider>
+          </Providers>
         </AppRouterCacheProvider>
       </body>
       {isProduction && <GoogleAnalytics gaId='G-1DG80KJHZQ' />}

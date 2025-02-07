@@ -210,9 +210,11 @@ export default function Home() {
         justifyContent='center'
         alignItems='center'
       >
-        {startDate && endDate && (
-          <Clock startDate={startDate} endDate={endDate} />
-        )}
+        <Fade in={Boolean(startDate && endDate)} mountOnEnter>
+          <div>
+            <Clock startDate={startDate!} endDate={endDate!} />
+          </div>
+        </Fade>
       </Grid2>
       <Dialog
         open={isConfigDialogOpen}

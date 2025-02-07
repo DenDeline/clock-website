@@ -36,8 +36,8 @@ import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 
 import { z } from 'zod'
 
-const ClockDeathInputVariantEnum = z.enum(['age', 'date'])
-type ClockDeathInputVariantEnum = z.infer<typeof ClockDeathInputVariantEnum>
+const EndDateInputVariantEnum = z.enum(['age', 'date'])
+type EndDateInputVariantEnum = z.infer<typeof EndDateInputVariantEnum>
 
 const formSchema = z
   .object({
@@ -51,17 +51,16 @@ const formSchema = z
   .and(
     z.discriminatedUnion('variant', [
       z.object({
-        variant: ClockDeathInputVariantEnum.extract(['age']),
-        deadlineYears: z.coerce.number().positive({
-          message: 'Deadline years must be greater than 0',
+        variant: EndDateInputVariantEnum.extract(['age']),
+        endAge: z.coerce.number().positive({
+          message: 'End age must be greater than 0',
         }),
       }),
       z.object({
-        variant: ClockDeathInputVariantEnum.extract(['date']),
-        deadlineDate: z.custom<Dayjs>(
-          dayjs.isDayjs,
-          'Deadline date must not be empty',
-        ),
+        variant: EndDateInputVariantEnum.extract(['date']),
+        endDate: z
+          .custom<Dayjs>(dayjs.isDayjs, 'End date date must not be empty')
+          .refine((val) => val.isValid(), { message: 'Invalid date' }),
       }),
     ]),
   )
@@ -69,35 +68,40 @@ const formSchema = z
 type FormSchema = z.infer<typeof formSchema>
 
 const configSchema = z.object({
-  variant: ClockDeathInputVariantEnum,
+  variant: EndDateInputVariantEnum,
   startDate: z
     .union([
       z.custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty'),
       z.string().transform(dayjs),
     ])
     .refine((val) => val.isValid(), { message: 'Invalid date' }),
-  durationMs: z.coerce.number(),
+  endDate: z
+    .union([
+      z.custom<Dayjs>(dayjs.isDayjs, 'End date must not be empty'),
+      z.string().transform(dayjs),
+    ])
+    .refine((val) => val.isValid(), { message: 'Invalid date' }),
 })
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false)
-
-  const [deadlineInputVariant, setDeadlineInputVariant] =
-    useState<ClockDeathInputVariantEnum>(ClockDeathInputVariantEnum.enum.age)
-  const deadlineInputVariantControlId = useId()
-  const [startDate, setStartDate] = useState<Dayjs | null>(null)
-  const [durationMs, setDurationMs] = useState<number>(0)
-
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
+
+  const endDateVariantInputId = useId()
+  const [endDateInputVariant, setEndDateInputVariant] =
+    useState<EndDateInputVariantEnum>(EndDateInputVariantEnum.enum.age)
+
+  const [startDate, setStartDate] = useState<Dayjs | null>(null)
+  const [endDate, setEndDate] = useState<Dayjs | null>(null)
 
   const { control, handleSubmit, reset, resetField } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      variant: deadlineInputVariant,
+      variant: endDateInputVariant,
       startDate: startDate!,
-      deadlineYears: 76,
-      deadlineDate: null!,
+      endAge: 76,
+      endDate: endDate!,
     },
   })
 
@@ -106,17 +110,15 @@ export default function Home() {
       const config = JSON.parse(window.localStorage.getItem('config') || '{}')
       const result = configSchema.parse(config)
 
+      setEndDateInputVariant(result.variant)
       setStartDate(result.startDate)
-      setDeadlineInputVariant(result.variant)
-      setDurationMs(result.durationMs)
-
-      const deadlineDate = result.startDate.add(result.durationMs)
+      setEndDate(result.endDate)
 
       reset({
         variant: result.variant,
         startDate: result.startDate,
-        deadlineYears: deadlineDate.diff(result.startDate, 'y'),
-        deadlineDate: deadlineDate,
+        endAge: result.endDate.diff(result.startDate, 'y'),
+        endDate: result.endDate,
       })
 
       setIsInitialized(true)
@@ -127,38 +129,36 @@ export default function Home() {
   }, [reset])
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
-    const newDurationMs = (
+    const endDate =
       data.variant === 'date'
-        ? data.deadlineDate
-        : data.startDate.add(data.deadlineYears, 'y')
-    ).diff(data.startDate)
+        ? data.endDate
+        : data.startDate.add(data.endAge, 'y')
 
     const config = {
       variant: data.variant,
       startDate: data.startDate.format('YYYY-MM-DD'),
-      durationMs: newDurationMs,
+      endDate: endDate.format('YYYY-MM-DD'),
     }
 
     window.localStorage.setItem('config', JSON.stringify(config))
 
-    setDeadlineInputVariant(data.variant)
+    setEndDateInputVariant(data.variant)
     setStartDate(data.startDate)
-    setDurationMs(newDurationMs)
+    setEndDate(endDate)
 
     setIsConfigDialogOpen(false)
   }
 
   const handleDialogExited = useCallback(() => {
     setIsInitialized(true)
-    const deadlineDate = startDate!.add(durationMs)
 
     reset({
-      variant: deadlineInputVariant,
+      variant: endDateInputVariant,
       startDate: startDate!,
-      deadlineYears: deadlineDate.diff(startDate, 'y'),
-      deadlineDate,
+      endDate: endDate!,
+      endAge: endDate!.diff(startDate, 'y'),
     })
-  }, [startDate, durationMs, deadlineInputVariant, reset])
+  }, [startDate, endDate, endDateInputVariant, reset])
 
   return (
     <>
@@ -210,7 +210,9 @@ export default function Home() {
         justifyContent='center'
         alignItems='center'
       >
-        {startDate && <Clock startDate={startDate} durationMs={durationMs} />}
+        {startDate && endDate && (
+          <Clock startDate={startDate} endDate={endDate} />
+        )}
       </Grid2>
       <Dialog
         open={isConfigDialogOpen}
@@ -265,25 +267,25 @@ export default function Home() {
             render={({ field, fieldState: { error } }) => (
               <>
                 <FormControl error={!!error} margin='dense'>
-                  <FormLabel id={deadlineInputVariantControlId}>
-                    Deadline input format
+                  <FormLabel id={endDateVariantInputId}>
+                    How should the end date be calculated?
                   </FormLabel>
                   <RadioGroup
                     {...field}
                     onTransitionEnd={() => {
-                      resetField('deadlineDate')
-                      resetField('deadlineYears')
+                      resetField('endDate')
+                      resetField('endAge')
                     }}
                     row
-                    aria-labelledby={deadlineInputVariantControlId}
+                    aria-labelledby={endDateVariantInputId}
                   >
                     <FormControlLabel
-                      value={ClockDeathInputVariantEnum.enum.age}
+                      value={EndDateInputVariantEnum.enum.age}
                       control={<Radio />}
-                      label='Years'
+                      label='Age'
                     />
                     <FormControlLabel
-                      value={ClockDeathInputVariantEnum.enum.date}
+                      value={EndDateInputVariantEnum.enum.date}
                       control={<Radio />}
                       label='Date'
                     />
@@ -293,13 +295,13 @@ export default function Home() {
                 {field.value === 'age' ? (
                   <Controller
                     key={'.01'}
-                    name={'deadlineYears'}
+                    name={'endAge'}
                     control={control}
                     render={({ field, fieldState: { error } }) => (
                       <TextField
                         {...field}
                         required
-                        label='Deadline years span'
+                        label='End age'
                         variant='standard'
                         type='number'
                         margin='dense'
@@ -313,7 +315,7 @@ export default function Home() {
                 ) : (
                   <Controller
                     key={'.02'}
-                    name={'deadlineDate'}
+                    name={'endDate'}
                     control={control}
                     render={({
                       field: { ref, ...fieldProps },
@@ -323,7 +325,7 @@ export default function Home() {
                         {...fieldProps}
                         inputRef={ref}
                         required
-                        label='Deadline date'
+                        label='End date'
                         variant='standard'
                         margin='dense'
                         fullWidth

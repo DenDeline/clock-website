@@ -3,18 +3,28 @@
 import { convertPercentageToTime, formatClockValue } from '@/utils/clock'
 import { Typography } from '@mui/material'
 import dayjs, { type Dayjs } from 'dayjs'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 interface ClockProps {
   startDate: Dayjs
-  durationMs: number
+  endDate: Dayjs
 }
 
-function Clock({ startDate, durationMs }: ClockProps) {
-  const getLifePercentage = useCallback(
-    () => dayjs().diff(startDate) / durationMs,
-    [startDate, durationMs],
+function Clock({ startDate, endDate }: ClockProps) {
+  const durationMs = useMemo(
+    () => endDate.diff(startDate),
+    [endDate, startDate],
   )
+
+  const getLifePercentage = useCallback(() => {
+    const now = dayjs()
+
+    if (startDate.isAfter(now)) {
+      return 0
+    }
+
+    return now.diff(startDate) / durationMs
+  }, [startDate, durationMs])
 
   const [lifePercentage, setLifePercentage] = useState(getLifePercentage)
   const [displayDots, setDisplayDots] = useState(true)

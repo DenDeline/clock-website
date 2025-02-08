@@ -1,13 +1,10 @@
-import type { Metadata } from 'next'
-import { GoogleAnalytics } from '@next/third-parties/google'
-
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
-import { CssBaseline, ThemeProvider } from '@mui/material'
-
-import { Roboto } from 'next/font/google'
-
 import theme from '@/theme'
 import { getAppUrl } from '@/utils/urls'
+import { CssBaseline, ThemeProvider } from '@mui/material'
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
+import { GoogleAnalytics } from '@next/third-parties/google'
+import type { Metadata } from 'next'
+import { Roboto } from 'next/font/google'
 import Providers from './providers'
 
 const roboto = Roboto({

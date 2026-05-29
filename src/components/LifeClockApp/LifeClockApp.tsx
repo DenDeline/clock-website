@@ -1,6 +1,7 @@
 'use client'
 
 import { Clock } from '@/components'
+import type { Dictionary } from '@/i18n'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SettingsIcon from '@mui/icons-material/Settings'
 import VisibilityIcon from '@mui/icons-material/Visibility'
@@ -32,57 +33,75 @@ import {
 
 import { DateField } from '@mui/x-date-pickers'
 import dayjs, { type Dayjs } from 'dayjs'
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 
 import { z } from 'zod'
 
 const EndDateInputVariantEnum = z.enum(['age', 'date'])
 type EndDateInputVariantEnum = z.infer<typeof EndDateInputVariantEnum>
+type LifeClockAppMessages = Dictionary['app']
 
-const formSchema = z
-  .object({
-    startDate: z
-      .custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty')
-      .refine((val) => val.isValid(), { message: 'Invalid date' }),
-  })
-  .and(
-    z.discriminatedUnion('variant', [
-      z.object({
-        variant: EndDateInputVariantEnum.extract(['age']),
-        endAge: z.coerce.number<number>().positive({
-          message: 'End age must be greater than 0',
+function createFormSchema(messages: LifeClockAppMessages) {
+  return z
+    .object({
+      startDate: z
+        .custom<Dayjs>(dayjs.isDayjs, messages.validation.startDateRequired)
+        .refine((val) => val.isValid(), {
+          message: messages.validation.invalidDate,
         }),
+    })
+    .and(
+      z.discriminatedUnion('variant', [
+        z.object({
+          variant: EndDateInputVariantEnum.extract(['age']),
+          endAge: z.coerce.number<number>().positive({
+            message: messages.validation.endAgePositive,
+          }),
+        }),
+        z.object({
+          variant: EndDateInputVariantEnum.extract(['date']),
+          endDate: z
+            .custom<Dayjs>(dayjs.isDayjs, messages.validation.endDateRequired)
+            .refine((val) => val.isValid(), {
+              message: messages.validation.invalidDate,
+            }),
+        }),
+      ]),
+    )
+}
+
+type FormSchemaType = ReturnType<typeof createFormSchema>
+type FormInput = z.input<FormSchemaType>
+type FormSchema = z.output<FormSchemaType>
+
+function createConfigSchema(messages: LifeClockAppMessages) {
+  return z.object({
+    variant: EndDateInputVariantEnum,
+    startDate: z
+      .union([
+        z.custom<Dayjs>(dayjs.isDayjs, messages.validation.startDateRequired),
+        z.string().transform(dayjs),
+      ])
+      .refine((val) => val.isValid(), {
+        message: messages.validation.invalidDate,
       }),
-      z.object({
-        variant: EndDateInputVariantEnum.extract(['date']),
-        endDate: z
-          .custom<Dayjs>(dayjs.isDayjs, 'End date date must not be empty')
-          .refine((val) => val.isValid(), { message: 'Invalid date' }),
+    endDate: z
+      .union([
+        z.custom<Dayjs>(dayjs.isDayjs, messages.validation.endDateRequired),
+        z.string().transform(dayjs),
+      ])
+      .refine((val) => val.isValid(), {
+        message: messages.validation.invalidDate,
       }),
-    ]),
-  )
+  })
+}
 
-type FormInput = z.input<typeof formSchema>
-type FormSchema = z.output<typeof formSchema>
-
-const configSchema = z.object({
-  variant: EndDateInputVariantEnum,
-  startDate: z
-    .union([
-      z.custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty'),
-      z.string().transform(dayjs),
-    ])
-    .refine((val) => val.isValid(), { message: 'Invalid date' }),
-  endDate: z
-    .union([
-      z.custom<Dayjs>(dayjs.isDayjs, 'End date must not be empty'),
-      z.string().transform(dayjs),
-    ])
-    .refine((val) => val.isValid(), { message: 'Invalid date' }),
-})
-
-function ColorModeSelector() {
+function ColorModeSelector({
+  messages,
+}: Readonly<{
+  messages: LifeClockAppMessages
+}>) {
   const colorModeInputId = useId()
   const { mode, setMode } = useColorScheme()
 
@@ -92,7 +111,7 @@ function ColorModeSelector() {
 
   return (
     <FormControl margin='dense'>
-      <FormLabel id={colorModeInputId}>Color mode</FormLabel>
+      <FormLabel id={colorModeInputId}>{messages.colorMode.label}</FormLabel>
       <RadioGroup
         row
         aria-labelledby={colorModeInputId}
@@ -101,15 +120,31 @@ function ColorModeSelector() {
           setMode(event.target.value as 'system' | 'light' | 'dark')
         }}
       >
-        <FormControlLabel value='system' control={<Radio />} label='System' />
-        <FormControlLabel value='light' control={<Radio />} label='Light' />
-        <FormControlLabel value='dark' control={<Radio />} label='Dark' />
+        <FormControlLabel
+          value='system'
+          control={<Radio />}
+          label={messages.colorMode.system}
+        />
+        <FormControlLabel
+          value='light'
+          control={<Radio />}
+          label={messages.colorMode.light}
+        />
+        <FormControlLabel
+          value='dark'
+          control={<Radio />}
+          label={messages.colorMode.dark}
+        />
       </RadioGroup>
     </FormControl>
   )
 }
 
-export default function LifeClockApp() {
+export default function LifeClockApp({
+  messages,
+}: Readonly<{
+  messages: LifeClockAppMessages
+}>) {
   const [isInitialized, setIsInitialized] = useState(false)
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
@@ -120,6 +155,8 @@ export default function LifeClockApp() {
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null)
   const [endDate, setEndDate] = useState<Dayjs | null>(null)
+  const formSchema = useMemo(() => createFormSchema(messages), [messages])
+  const configSchema = useMemo(() => createConfigSchema(messages), [messages])
 
   const { control, handleSubmit, reset, resetField } = useForm<
     FormInput,
@@ -159,7 +196,7 @@ export default function LifeClockApp() {
       window.localStorage.removeItem('config')
       setIsConfigDialogOpen(true)
     }
-  }, [reset])
+  }, [configSchema, reset])
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
     const endDate =
@@ -205,7 +242,7 @@ export default function LifeClockApp() {
         <Stack spacing={1}>
           <Fade in={isInterfaceVisible} appear={false}>
             <Tooltip
-              title={'Settings'}
+              title={messages.controls.settings}
               placement='left'
               arrow
               enterDelay={200}
@@ -220,14 +257,18 @@ export default function LifeClockApp() {
             </Tooltip>
           </Fade>
           <Tooltip
-            title={isInterfaceVisible ? 'Hide interface' : 'Show interface'}
+            title={
+              isInterfaceVisible
+                ? messages.controls.hideInterface
+                : messages.controls.showInterface
+            }
             placement='left'
             arrow
             enterDelay={200}
             enterNextDelay={200}
           >
             <IconButton
-              aria-label='Toggle interface visibility'
+              aria-label={messages.controls.toggleInterface}
               size='small'
               onClick={() => setIsInterfaceVisible((v) => !v)}
             >
@@ -265,12 +306,13 @@ export default function LifeClockApp() {
         }}
         onClose={isInitialized ? () => setIsConfigDialogOpen(false) : undefined}
       >
-        <DialogTitle>{isInitialized ? 'Settings' : 'Welcome'}</DialogTitle>
+        <DialogTitle>
+          {isInitialized
+            ? messages.dialog.settingsTitle
+            : messages.dialog.welcomeTitle}
+        </DialogTitle>
         <DialogContent dividers>
-          <Typography gutterBottom>
-            Visualize your life&apos;s journey through a unique 24-hour
-            perspective.
-          </Typography>
+          <Typography gutterBottom>{messages.dialog.intro}</Typography>
           <Controller
             name='startDate'
             control={control}
@@ -282,11 +324,11 @@ export default function LifeClockApp() {
                 {...fieldProps}
                 inputRef={ref}
                 required
-                label='Start date'
+                label={messages.form.startDate}
                 variant='standard'
                 margin='dense'
                 fullWidth
-                format='DD/MM/YYYY'
+                format={messages.dateFormat}
                 disableFuture
                 autoFocus={!isInitialized}
                 slotProps={{
@@ -305,7 +347,7 @@ export default function LifeClockApp() {
               <>
                 <FormControl error={!!error} margin='dense'>
                   <FormLabel id={endDateVariantInputId}>
-                    How should the end date be calculated?
+                    {messages.form.endDateQuestion}
                   </FormLabel>
                   <RadioGroup
                     {...field}
@@ -319,12 +361,12 @@ export default function LifeClockApp() {
                     <FormControlLabel
                       value={EndDateInputVariantEnum.enum.age}
                       control={<Radio />}
-                      label='Age'
+                      label={messages.form.age}
                     />
                     <FormControlLabel
                       value={EndDateInputVariantEnum.enum.date}
                       control={<Radio />}
-                      label='Date'
+                      label={messages.form.date}
                     />
                   </RadioGroup>
                   <FormHelperText>{error?.message}</FormHelperText>
@@ -338,7 +380,7 @@ export default function LifeClockApp() {
                       <TextField
                         {...field}
                         required
-                        label='End age'
+                        label={messages.form.endAge}
                         variant='standard'
                         type='number'
                         margin='dense'
@@ -362,12 +404,12 @@ export default function LifeClockApp() {
                         {...fieldProps}
                         inputRef={ref}
                         required
-                        label='End date'
+                        label={messages.form.endDate}
                         variant='standard'
                         margin='dense'
                         fullWidth
                         sx={{ mb: 2 }}
-                        format='DD/MM/YYYY'
+                        format={messages.dateFormat}
                         slotProps={{
                           textField: {
                             error: !!error,
@@ -381,19 +423,16 @@ export default function LifeClockApp() {
               </>
             )}
           />
-          <ColorModeSelector />
-          <Alert severity='info'>
-            We use your birthday to calculate how far you are along your
-            life&apos;s clock. The mean lifespan helps us estimate the full
-            24-hour cycle. This information is only stored on your device and is
-            not shared.
-          </Alert>
+          <ColorModeSelector messages={messages} />
+          <Alert severity='info'>{messages.form.info}</Alert>
         </DialogContent>
         <DialogActions>
           {isInitialized && (
-            <Button onClick={() => setIsConfigDialogOpen(false)}>Close</Button>
+            <Button onClick={() => setIsConfigDialogOpen(false)}>
+              {messages.dialog.close}
+            </Button>
           )}
-          <Button type='submit'>Save</Button>
+          <Button type='submit'>{messages.dialog.save}</Button>
         </DialogActions>
       </Dialog>
     </>

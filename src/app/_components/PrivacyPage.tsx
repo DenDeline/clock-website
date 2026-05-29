@@ -4,6 +4,7 @@ import {
   getLocalizedUrl,
   type Locale,
 } from '@/i18n'
+import type { PrivacySectionBody as PrivacySectionBodyContent } from '@/i18n/dictionaries/types'
 import { getAppUrl } from '@/utils/urls'
 import { Box, Container, Link, Stack, Typography } from '@mui/material'
 
@@ -56,7 +57,7 @@ export default function PrivacyPage({ locale }: Readonly<{ locale: Locale }>) {
                   {section.title}
                 </Typography>
                 <Typography variant='body1' color='text.secondary'>
-                  {section.body}
+                  <PrivacySectionBody>{section.body}</PrivacySectionBody>
                 </Typography>
               </Box>
             ))}
@@ -69,4 +70,24 @@ export default function PrivacyPage({ locale }: Readonly<{ locale: Locale }>) {
       </Box>
     </>
   )
+}
+
+function PrivacySectionBody({
+  children,
+}: Readonly<{ children: PrivacySectionBodyContent }>) {
+  if (typeof children === 'string') {
+    return children
+  }
+
+  return children.map((part, index) => {
+    if (typeof part === 'string') {
+      return part
+    }
+
+    return (
+      <Link href={part.href} key={`${part.href}-${index}`}>
+        {part.text}
+      </Link>
+    )
+  })
 }

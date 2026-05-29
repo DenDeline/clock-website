@@ -51,7 +51,15 @@ const en = {
       sections: [
         {
           title: 'Who operates Life Clock',
-          body: 'Life Clock is operated by DenDeline. For privacy questions or requests, contact contact@dendeline.com.',
+          body: [
+            'Life Clock is operated by DenDeline. For privacy questions or requests, contact ',
+            {
+              type: 'link',
+              href: 'mailto:contact@dendeline.com',
+              text: 'contact@dendeline.com',
+            },
+            '.',
+          ],
         },
         {
           title: 'Information stored on your device',
@@ -71,7 +79,15 @@ const en = {
         },
         {
           title: 'Sharing',
-          body: "Life Clock does not sell personal information. Analytics and performance data is processed by Google Analytics according to Google's terms and privacy practices. Learn more about how Google uses data from sites that use its services at policies.google.com/technologies/partner-sites.",
+          body: [
+            "Life Clock does not sell personal information. Analytics and performance data is processed by Google Analytics according to Google's terms and privacy practices. Learn more about how Google uses data from sites that use its services at ",
+            {
+              type: 'link',
+              href: 'https://policies.google.com/technologies/partner-sites',
+              text: 'policies.google.com/technologies/partner-sites',
+            },
+            '.',
+          ],
         },
         {
           title: 'Retention',
@@ -79,7 +95,15 @@ const en = {
         },
         {
           title: 'Your choices',
-          body: "You can clear Life Clock's local settings by clearing site data for this website in your browser. You can also block or clear cookies and similar identifiers through your browser settings. If you do not want Google Analytics to be used in your browser, you can install Google's Analytics opt-out browser add-on. You may also contact contact@dendeline.com with privacy questions or requests.",
+          body: [
+            "You can clear Life Clock's local settings by clearing site data for this website in your browser. You can also block or clear cookies and similar identifiers through your browser settings. If you do not want Google Analytics to be used in your browser, you can install Google's Analytics opt-out browser add-on. You may also contact ",
+            {
+              type: 'link',
+              href: 'mailto:contact@dendeline.com',
+              text: 'contact@dendeline.com',
+            },
+            ' with privacy questions or requests.',
+          ],
         },
         {
           title: 'Children',

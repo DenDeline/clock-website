@@ -1,6 +1,6 @@
 import LifeClockApp from '@/components/LifeClockApp'
 import { getAppUrl } from '@/utils/urls'
-import { Box, Container, Stack, Typography } from '@mui/material'
+import { Box, Container, Link, Stack, Typography } from '@mui/material'
 import type { Metadata } from 'next'
 
 const title = 'Life Clock | Visualize Your Life as a 24-Hour Clock'
@@ -140,7 +140,8 @@ export default function Home() {
                   Your dates stay in your browser. Life Clock stores the
                   configuration locally on your device so the clock can reopen
                   with the same settings, and it does not send those dates to a
-                  server.
+                  server. Read the full{' '}
+                  <Link href='/privacy'>Privacy Policy</Link>.
                 </Typography>
               </Box>
             </Stack>

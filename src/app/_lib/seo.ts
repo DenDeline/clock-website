@@ -13,16 +13,23 @@ import type { Metadata } from 'next'
 const ogImagePath = '/opengraph-image'
 
 type PageKey = 'home' | 'privacy'
+type LanguageAlternates = Record<Locale, string> & {
+  'x-default': string
+}
 
 const routePaths: Record<PageKey, RoutePath> = {
   home: '/',
   privacy: '/privacy',
 }
 
-function createLanguageAlternates(path: RoutePath) {
+function createLanguageAlternates(path: RoutePath): LanguageAlternates {
   const appUrl = getAppUrl()
-  const alternates = Object.fromEntries(
-    locales.map((locale) => [locale, getLocalizedUrl(path, locale, appUrl)]),
+  const alternates = locales.reduce(
+    (acc, locale) => ({
+      ...acc,
+      [locale]: getLocalizedUrl(path, locale, appUrl),
+    }),
+    {} as Record<Locale, string>,
   )
 
   return {

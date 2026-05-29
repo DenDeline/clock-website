@@ -1,14 +1,8 @@
 import AppRootLayout from '../_components/AppRootLayout'
 import { createRootMetadata } from '../_lib/seo'
-import { getDictionary, isLocale, nonDefaultLocales } from '@/i18n'
+import { getDictionary, isNonDefaultLocale, nonDefaultLocales } from '@/i18n'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-
-type LocaleParams = {
-  params: Promise<{
-    locale: string
-  }>
-}
 
 export const dynamicParams = false
 
@@ -18,10 +12,10 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: LocaleParams): Promise<Metadata> {
+}: LayoutProps<'/[locale]'>): Promise<Metadata> {
   const { locale } = await params
 
-  if (!isLocale(locale)) {
+  if (!isNonDefaultLocale(locale)) {
     notFound()
   }
 
@@ -31,20 +25,18 @@ export async function generateMetadata({
 export default async function LocaleLayout({
   children,
   params,
-}: Readonly<
-  LocaleParams & {
-    children: React.ReactNode
-  }
->) {
+}: Readonly<LayoutProps<'/[locale]'>>) {
   const { locale } = await params
 
-  if (!isLocale(locale)) {
+  if (!isNonDefaultLocale(locale)) {
     notFound()
   }
 
   const dictionary = getDictionary(locale)
 
   return (
-    <AppRootLayout lang={dictionary.locale.htmlLang}>{children}</AppRootLayout>
+    <AppRootLayout lang={dictionary.locale.htmlLang} locale={locale}>
+      {children}
+    </AppRootLayout>
   )
 }

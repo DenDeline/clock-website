@@ -10,6 +10,10 @@ import { getAppUrl } from '@/utils/urls'
 
 export const dynamic = 'force-static'
 
+type LanguageAlternates = Record<Locale, string> & {
+  'x-default': string
+}
+
 const lastModified = new Date('2026-05-29')
 const routes: Array<{
   path: RoutePath
@@ -28,9 +32,16 @@ const routes: Array<{
   },
 ]
 
-function getLanguageAlternates(path: RoutePath, appUrl: URL) {
-  const alternates = Object.fromEntries(
-    locales.map((locale) => [locale, getLocalizedUrl(path, locale, appUrl)]),
+function getLanguageAlternates(
+  path: RoutePath,
+  appUrl: URL,
+): LanguageAlternates {
+  const alternates = locales.reduce(
+    (acc, locale) => ({
+      ...acc,
+      [locale]: getLocalizedUrl(path, locale, appUrl),
+    }),
+    {} as Record<Locale, string>,
   )
 
   return {

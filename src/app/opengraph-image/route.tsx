@@ -1,14 +1,13 @@
 import { ImageResponse } from 'next/og'
 
 export const dynamic = 'force-static'
-export const alt = 'Life Clock visualizing a lifespan as a 24-hour clock'
-export const contentType = 'image/png'
-export const size = {
+
+const size = {
   width: 1200,
   height: 630,
 }
 
-export default function Image() {
+export function GET() {
   return new ImageResponse(
     <div
       style={{

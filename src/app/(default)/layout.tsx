@@ -12,6 +12,8 @@ export default function DefaultLocaleLayout({
   children: React.ReactNode
 }>) {
   return (
-    <AppRootLayout lang={dictionary.locale.htmlLang}>{children}</AppRootLayout>
+    <AppRootLayout lang={dictionary.locale.htmlLang} locale={defaultLocale}>
+      {children}
+    </AppRootLayout>
   )
 }

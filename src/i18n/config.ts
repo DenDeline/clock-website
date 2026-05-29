@@ -1,25 +1,32 @@
+import type { Route } from 'next'
+
 export const defaultLocale = 'en' as const
 export const locales = [defaultLocale, 'ru'] as const
 
 export type Locale = (typeof locales)[number]
-export type RoutePath = '/' | '/privacy'
+export type NonDefaultLocale = Exclude<Locale, typeof defaultLocale>
+export type RoutePath = Extract<Route, '/' | '/privacy'>
 
 export const nonDefaultLocales = locales.filter(
   (locale) => locale !== defaultLocale,
-)
+) as readonly NonDefaultLocale[]
 
 export function isLocale(value: string): value is Locale {
   return locales.includes(value as Locale)
 }
 
-export function getLocalizedPath(path: RoutePath, locale: Locale): string {
+export function isNonDefaultLocale(value: string): value is NonDefaultLocale {
+  return nonDefaultLocales.includes(value as NonDefaultLocale)
+}
+
+export function getLocalizedPath(path: RoutePath, locale: Locale): Route {
   const prefix = locale === defaultLocale ? '' : `/${locale}`
 
   if (path === '/') {
-    return prefix || '/'
+    return (prefix || '/') as Route
   }
 
-  return `${prefix}${path}`
+  return `${prefix}${path}` as Route
 }
 
 export function getLocalizedUrl(

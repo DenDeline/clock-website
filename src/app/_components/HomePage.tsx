@@ -6,7 +6,8 @@ import {
   type Locale,
 } from '@/i18n'
 import { getAppUrl } from '@/utils/urls'
-import { Box, Container, Link, Stack, Typography } from '@mui/material'
+import { Box, Container, Stack, Typography } from '@mui/material'
+import NextLink from 'next/link'
 
 export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
   const dictionary = getDictionary(locale)
@@ -95,9 +96,15 @@ export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
                 </Typography>
                 <Typography variant='body1' color='text.secondary'>
                   {page.privacy.beforeLink}{' '}
-                  <Link href={getLocalizedPath('/privacy', locale)}>
+                  <NextLink
+                    href={getLocalizedPath('/privacy', locale)}
+                    style={{
+                      color: 'var(--mui-palette-primary-main)',
+                      textDecoration: 'underline',
+                    }}
+                  >
                     {page.privacy.link}
-                  </Link>
+                  </NextLink>
                   .
                 </Typography>
               </Box>

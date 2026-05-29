@@ -1,14 +1,8 @@
 import PrivacyPage from '../../_components/PrivacyPage'
 import { createPageMetadata } from '../../_lib/seo'
-import { isLocale, nonDefaultLocales } from '@/i18n'
+import { isNonDefaultLocale, nonDefaultLocales } from '@/i18n'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-
-type LocalePageProps = {
-  params: Promise<{
-    locale: string
-  }>
-}
 
 export const dynamicParams = false
 
@@ -18,20 +12,20 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: LocalePageProps): Promise<Metadata> {
+}: PageProps<'/[locale]/privacy'>): Promise<Metadata> {
   const { locale } = await params
 
-  if (!isLocale(locale)) {
+  if (!isNonDefaultLocale(locale)) {
     notFound()
   }
 
   return createPageMetadata(locale, 'privacy')
 }
 
-export default async function Page({ params }: LocalePageProps) {
+export default async function Page({ params }: PageProps<'/[locale]/privacy'>) {
   const { locale } = await params
 
-  if (!isLocale(locale)) {
+  if (!isNonDefaultLocale(locale)) {
     notFound()
   }
 

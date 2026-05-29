@@ -1,11 +1,10 @@
-import theme from '@/theme'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
-import { CssBaseline, ThemeProvider } from '@mui/material'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { Roboto } from 'next/font/google'
 import Providers from '../providers'
 import WebVitals from '../web-vitals'
+import type { Locale } from '@/i18n'
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -17,9 +16,11 @@ const roboto = Roboto({
 export default function AppRootLayout({
   children,
   lang,
+  locale,
 }: Readonly<{
   children: React.ReactNode
   lang: string
+  locale: Locale
 }>) {
   const isProduction = process.env.NODE_ENV === 'production'
 
@@ -29,12 +30,7 @@ export default function AppRootLayout({
         <InitColorSchemeScript defaultMode='system' />
         <WebVitals />
         <AppRouterCacheProvider>
-          <Providers>
-            <ThemeProvider theme={theme} defaultMode='system'>
-              <CssBaseline enableColorScheme />
-              {children}
-            </ThemeProvider>
-          </Providers>
+          <Providers locale={locale}>{children}</Providers>
         </AppRouterCacheProvider>
       </body>
       {isProduction && <GoogleAnalytics gaId='G-1DG80KJHZQ' />}

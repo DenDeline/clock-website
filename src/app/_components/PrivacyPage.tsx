@@ -7,6 +7,7 @@ import {
 import type { PrivacySectionBody as PrivacySectionBodyContent } from '@/i18n/dictionaries/types'
 import { getAppUrl } from '@/utils/urls'
 import { Box, Container, Link, Stack, Typography } from '@mui/material'
+import NextLink from 'next/link'
 
 export default function PrivacyPage({ locale }: Readonly<{ locale: Locale }>) {
   const dictionary = getDictionary(locale)
@@ -63,7 +64,15 @@ export default function PrivacyPage({ locale }: Readonly<{ locale: Locale }>) {
             ))}
 
             <Box>
-              <Link href={getLocalizedPath('/', locale)}>{page.backLink}</Link>
+              <NextLink
+                href={getLocalizedPath('/', locale)}
+                style={{
+                  color: 'var(--mui-palette-primary-main)',
+                  textDecoration: 'underline',
+                }}
+              >
+                {page.backLink}
+              </NextLink>
             </Box>
           </Stack>
         </Container>

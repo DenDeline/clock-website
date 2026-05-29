@@ -35,8 +35,6 @@ function Clock({ startDate, endDate }: ClockProps) {
 
   const intervalRef = useRef<number>(undefined)
   useEffect(() => {
-    setLifePercentage(getLifePercentage())
-
     intervalRef.current = window.setInterval(() => {
       setLifePercentage(getLifePercentage())
       setDisplayDots((v) => !v)
@@ -48,7 +46,12 @@ function Clock({ startDate, endDate }: ClockProps) {
   }, [getLifePercentage])
 
   return (
-    <Typography variant='h1' fontWeight={700}>
+    <Typography
+      variant='h1'
+      sx={{
+        fontWeight: 700,
+      }}
+    >
       <span>{clockHours}</span>
       <span style={{ visibility: displayDots ? 'visible' : 'hidden' }}>:</span>
       <span>{clockMinutes}</span>

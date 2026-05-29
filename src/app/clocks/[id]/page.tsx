@@ -19,7 +19,7 @@ import {
   FormControlLabel,
   FormHelperText,
   FormLabel,
-  Grid2,
+  Grid,
   IconButton,
   Radio,
   RadioGroup,
@@ -42,17 +42,14 @@ type EndDateInputVariantEnum = z.infer<typeof EndDateInputVariantEnum>
 const formSchema = z
   .object({
     startDate: z
-      .union([
-        z.custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty'),
-        z.string().transform(dayjs),
-      ])
+      .custom<Dayjs>(dayjs.isDayjs, 'Start date must not be empty')
       .refine((val) => val.isValid(), { message: 'Invalid date' }),
   })
   .and(
     z.discriminatedUnion('variant', [
       z.object({
         variant: EndDateInputVariantEnum.extract(['age']),
-        endAge: z.coerce.number().positive({
+        endAge: z.coerce.number<number>().positive({
           message: 'End age must be greater than 0',
         }),
       }),
@@ -65,7 +62,8 @@ const formSchema = z
     ]),
   )
 
-type FormSchema = z.infer<typeof formSchema>
+type FormInput = z.input<typeof formSchema>
+type FormSchema = z.output<typeof formSchema>
 
 const configSchema = z.object({
   variant: EndDateInputVariantEnum,
@@ -95,7 +93,11 @@ export default function Home() {
   const [startDate, setStartDate] = useState<Dayjs | null>(null)
   const [endDate, setEndDate] = useState<Dayjs | null>(null)
 
-  const { control, handleSubmit, reset, resetField } = useForm<FormSchema>({
+  const { control, handleSubmit, reset, resetField } = useForm<
+    FormInput,
+    unknown,
+    FormSchema
+  >({
     resolver: zodResolver(formSchema),
     defaultValues: {
       variant: endDateInputVariant,
@@ -110,6 +112,9 @@ export default function Home() {
       const config = JSON.parse(window.localStorage.getItem('config') || '{}')
       const result = configSchema.parse(config)
 
+      // Local storage is only available after mount, so the persisted config has
+      // to hydrate the client state from this effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEndDateInputVariant(result.variant)
       setStartDate(result.startDate)
       setEndDate(result.endDate)
@@ -204,18 +209,20 @@ export default function Home() {
         </Stack>
       </Box>
 
-      <Grid2
+      <Grid
         container
-        height='100dvh'
-        justifyContent='center'
-        alignItems='center'
+        sx={{
+          height: '100dvh',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
         <Fade in={Boolean(startDate && endDate)} mountOnEnter>
           <div>
             <Clock startDate={startDate!} endDate={endDate!} />
           </div>
         </Fade>
-      </Grid2>
+      </Grid>
       <Dialog
         open={isConfigDialogOpen}
         onSubmit={handleSubmit(onSubmit)}

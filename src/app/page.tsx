@@ -10,7 +10,7 @@ import {
   CardContent,
   CardHeader,
   Fab,
-  Grid2 as Grid,
+  Grid,
   IconButton,
   Typography,
 } from '@mui/material'
@@ -70,7 +70,12 @@ function TestPage() {
             </Button>
           }
           title={
-            <Typography variant={'h4'} fontWeight={'bold'}>
+            <Typography
+              variant={'h4'}
+              sx={{
+                fontWeight: 'bold',
+              }}
+            >
               Your clocks
             </Typography>
           }
@@ -83,10 +88,13 @@ function TestPage() {
                   <CardHeader
                     title={
                       <Typography
-                        textAlign={'center'}
                         component='div'
                         variant={'body1'}
-                        sx={{ color: 'text.secondary', px: 6 }}
+                        sx={{
+                          textAlign: 'center',
+                          color: 'text.secondary',
+                          px: 6,
+                        }}
                       >
                         {timer.name}
                       </Typography>
@@ -117,8 +125,10 @@ function TestPage() {
                   <CardContent>
                     <Typography
                       variant={'h4'}
-                      fontWeight={'bold'}
-                      textAlign={'center'}
+                      sx={{
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                      }}
                     >
                       10:50
                     </Typography>

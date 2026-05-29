@@ -1,10 +1,11 @@
 'use client'
-import { styled, Typography, type TypographyProps } from '@mui/material'
+import { styled, Typography } from '@mui/material'
+import type { CSSProperties, ReactNode, Ref } from 'react'
 
 interface PageBlockInfoProps {
-  textAlign?: TypographyProps['textAlign']
-  ref?: React.Ref<HTMLDivElement>
-  children?: React.ReactNode
+  textAlign?: CSSProperties['textAlign']
+  ref?: Ref<HTMLDivElement>
+  children?: ReactNode
 }
 
 const PageBlockInfoRoot = styled('div', {
@@ -25,9 +26,11 @@ function PageBlockInfo({ children, textAlign, ref }: PageBlockInfoProps) {
   return (
     <PageBlockInfoRoot ref={ref} sx={{ textAlign }}>
       <Typography
-        sx={{ textAlign: { xs: 'center', sm: 'inherit' } }}
         variant={'h4'}
-        fontWeight={'bold'}
+        sx={{
+          fontWeight: 'bold',
+          textAlign: { xs: 'center', sm: 'inherit' },
+        }}
       >
         {children}
       </Typography>

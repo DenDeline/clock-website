@@ -1,7 +1,7 @@
 import theme from '@/theme'
 import { getAppUrl } from '@/utils/urls'
 import { CssBaseline, ThemeProvider } from '@mui/material'
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'

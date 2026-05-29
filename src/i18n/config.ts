@@ -1,5 +1,5 @@
 export const defaultLocale = 'en' as const
-export const locales = [defaultLocale] as const
+export const locales = [defaultLocale, 'ru'] as const
 
 export type Locale = (typeof locales)[number]
 export type RoutePath = '/' | '/privacy'

@@ -1,12 +1,12 @@
-import AppRootLayout from './_components/AppRootLayout'
-import { createRootMetadata } from './_lib/seo'
+import AppRootLayout from '../_components/AppRootLayout'
+import { createRootMetadata } from '../_lib/seo'
 import { defaultLocale, getDictionary } from '@/i18n'
 
 const dictionary = getDictionary(defaultLocale)
 
 export const metadata = createRootMetadata(defaultLocale)
 
-export default function RootLayout({
+export default function DefaultLocaleLayout({
   children,
 }: Readonly<{
   children: React.ReactNode

@@ -2,25 +2,29 @@
 
 ## Project Structure & Module Organization
 
-This is a Next.js 15 application using the App Router. Application routes live in `src/app`, including `page.tsx`, `layout.tsx`, `robots.ts`, `sitemap.ts`, and the dynamic clock route at `src/app/clocks/[id]/page.tsx`.
+This is a Next.js 16 application using the App Router and static export. Application routes and route metadata live in `src/app`, including `page.tsx`, `layout.tsx`, `providers.tsx`, `robots.ts`, `sitemap.ts`, and `opengraph-image.tsx`.
 
-Reusable UI belongs in `src/components`, with each component kept in its own folder and re-exported through `index.ts`. Shared helpers live in `src/utils`, shared theme setup is in `src/theme.ts`, and ambient TypeScript declarations are in `src/types`. Static public assets are stored in `public`.
+Reusable UI belongs in `src/components`, with each component kept in its own folder and re-exported through `index.ts`. `LifeClockApp` owns the client-side form state, localStorage-backed clock config, and MUI dialog flow. `Clock` renders the live clock display. Shared date/time and URL helpers live in `src/utils`, shared MUI theme setup is in `src/theme.ts`, and ambient TypeScript declarations are in `src/types`. Static public assets are stored in `public`.
 
 ## Build, Test, and Development Commands
 
-Use pnpm, matching the repository package manager.
+Use pnpm, matching the repository package manager (`pnpm@11.4.0`). Use Node `24.16.0`, matching `.nvmrc`.
 
 - `pnpm dev`: starts the local Next.js development server.
-- `pnpm build`: creates a production build and catches type/build regressions.
+- `pnpm build`: creates a static production build in `out` because `next.config.ts` sets `output: 'export'`; it also catches type/build regressions.
 - `pnpm start`: serves the production build locally after `pnpm build`.
-- `pnpm lint`: runs the configured Next.js ESLint checks.
+- `pnpm lint`: runs ESLint directly with the configured Next.js flat config.
 - `pnpm exec prettier --write .`: formats files using the repo Prettier config.
+
+Husky runs lint-staged on pre-commit, and lint-staged formats staged files with Prettier.
 
 ## Coding Style & Naming Conventions
 
 Write TypeScript and React components in the existing style. Prettier is configured with no semicolons, single quotes, and single quotes in JSX. Keep formatting tool-driven rather than hand-aligned.
 
 Use PascalCase for React component files and component names, such as `Clock.tsx` and `PageBlock.tsx`. Use camelCase for utility functions and values. Keep folder-level `index.ts` files for public exports when adding reusable modules.
+
+The app uses React 19, MUI 9, Dayjs, React Hook Form, and Zod. Prefer the existing MUI component patterns, Dayjs date values, Zod validation, and `@/*` TypeScript path alias instead of introducing parallel approaches.
 
 ## Testing Guidelines
 
@@ -36,6 +40,8 @@ Use concise commit subjects in the form `type: summary`, where common types incl
 
 Pull requests should include a brief description of the change, the routes or components affected, validation performed (`pnpm lint`, `pnpm build`, screenshots when UI changes), and any linked issue or deployment context.
 
+GitHub Pages deployment is configured in `.github/workflows/nextjs.yml`. It runs on `v*` tags or manual dispatch, builds with pnpm, and uploads the static `./out` artifact.
+
 ## Agent-Specific Instructions
 
-Keep edits scoped and consistent with the existing App Router structure. Do not introduce new tooling, dependencies, or test frameworks unless the task requires it. Prefer updating existing component and utility patterns over creating new abstractions.
+Keep edits scoped and consistent with the existing App Router structure and static-export deployment. Do not introduce new tooling, dependencies, or test frameworks unless the task requires it. Prefer updating existing component, utility, theme, and provider patterns over creating new abstractions.

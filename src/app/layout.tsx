@@ -6,6 +6,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 import Providers from './providers'
+import WebVitals from './web-vitals'
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -44,6 +45,7 @@ export default function RootLayout({
   return (
     <html lang='en' prefix='og: https://ogp.me/ns#'>
       <body className={roboto.variable}>
+        <WebVitals />
         <AppRouterCacheProvider>
           <Providers>
             <ThemeProvider theme={theme}>

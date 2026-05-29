@@ -45,3 +45,7 @@ GitHub Pages deployment is configured in `.github/workflows/nextjs.yml`. It runs
 ## Agent-Specific Instructions
 
 Keep edits scoped and consistent with the existing App Router structure and static-export deployment. Do not introduce new tooling, dependencies, or test frameworks unless the task requires it. Prefer updating existing component, utility, theme, and provider patterns over creating new abstractions.
+
+When working on Next.js behavior, use the project-level Next.js DevTools MCP integration when it is available. Call the `next-devtools-mcp` `init` tool first to establish current Next.js context, and use `nextjs_docs` for framework and API questions instead of relying on stale assumptions. When `pnpm dev` is running, use `nextjs_index` to discover the active dev server, then use `nextjs_call` for runtime tools such as `get_errors`, `get_logs`, `get_page_metadata`, and `get_project_metadata`.
+
+Prefer MCP runtime diagnostics before guessing about hydration, routing, metadata, build, or runtime errors. For UI verification, use browser tooling after MCP diagnostics or when visual interaction and screenshots are specifically needed.

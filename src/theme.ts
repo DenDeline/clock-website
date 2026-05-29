@@ -2,8 +2,11 @@
 import { createTheme } from '@mui/material/styles'
 
 const theme = createTheme({
-  palette: {
-    mode: 'dark',
+  cssVariables: {
+    colorSchemeSelector: 'data',
+  },
+  colorSchemes: {
+    dark: true,
   },
   typography: {
     fontFamily: 'var(--font-roboto)',

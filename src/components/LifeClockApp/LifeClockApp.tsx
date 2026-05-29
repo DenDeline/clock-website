@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import SettingsIcon from '@mui/icons-material/Settings'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import { useColorScheme } from '@mui/material/styles'
 
 import {
   Alert,
@@ -80,6 +81,33 @@ const configSchema = z.object({
     ])
     .refine((val) => val.isValid(), { message: 'Invalid date' }),
 })
+
+function ColorModeSelector() {
+  const colorModeInputId = useId()
+  const { mode, setMode } = useColorScheme()
+
+  if (!mode) {
+    return null
+  }
+
+  return (
+    <FormControl margin='dense'>
+      <FormLabel id={colorModeInputId}>Color mode</FormLabel>
+      <RadioGroup
+        row
+        aria-labelledby={colorModeInputId}
+        value={mode}
+        onChange={(event) => {
+          setMode(event.target.value as 'system' | 'light' | 'dark')
+        }}
+      >
+        <FormControlLabel value='system' control={<Radio />} label='System' />
+        <FormControlLabel value='light' control={<Radio />} label='Light' />
+        <FormControlLabel value='dark' control={<Radio />} label='Dark' />
+      </RadioGroup>
+    </FormControl>
+  )
+}
 
 export default function LifeClockApp() {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -353,6 +381,7 @@ export default function LifeClockApp() {
               </>
             )}
           />
+          <ColorModeSelector />
           <Alert severity='info'>
             We use your birthday to calculate how far you are along your
             life&apos;s clock. The mean lifespan helps us estimate the full

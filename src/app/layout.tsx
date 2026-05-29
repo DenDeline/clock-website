@@ -1,5 +1,6 @@
 import theme from '@/theme'
 import { getAppUrl } from '@/utils/urls'
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter'
 import { GoogleAnalytics } from '@next/third-parties/google'
@@ -43,13 +44,14 @@ export default function RootLayout({
   const isProduction = process.env.NODE_ENV === 'production'
 
   return (
-    <html lang='en' prefix='og: https://ogp.me/ns#'>
+    <html lang='en' prefix='og: https://ogp.me/ns#' suppressHydrationWarning>
       <body className={roboto.variable}>
+        <InitColorSchemeScript defaultMode='system' />
         <WebVitals />
         <AppRouterCacheProvider>
           <Providers>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
+            <ThemeProvider theme={theme} defaultMode='system'>
+              <CssBaseline enableColorScheme />
               {children}
             </ThemeProvider>
           </Providers>

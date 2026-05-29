@@ -2,11 +2,18 @@
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers'
-import { ruRU as pickersRuRU } from '@mui/x-date-pickers/locales'
+
+import {
+  jaJP as pickersJaJP,
+  ruRU as pickersRuRU,
+} from '@mui/x-date-pickers/locales'
+
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { useMemo } from 'react'
 import { createAppTheme } from '@/theme'
 import type { Locale } from '@/i18n'
+
+import 'dayjs/locale/ja'
 import 'dayjs/locale/ru'
 
 const pickerLocaleByLocale: Record<
@@ -17,6 +24,11 @@ const pickerLocaleByLocale: Record<
   }
 > = {
   en: {},
+  ja: {
+    adapterLocale: 'ja',
+    localeText:
+      pickersJaJP.components.MuiLocalizationProvider.defaultProps.localeText,
+  },
   ru: {
     adapterLocale: 'ru',
     localeText:

@@ -1,7 +1,7 @@
 import type { Route } from 'next'
 
 export const defaultLocale = 'en' as const
-export const locales = [defaultLocale, 'ru'] as const
+export const locales = [defaultLocale, 'ru', 'ja'] as const
 
 export type Locale = (typeof locales)[number]
 export type NonDefaultLocale = Exclude<Locale, typeof defaultLocale>

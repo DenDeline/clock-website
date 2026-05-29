@@ -16,15 +16,21 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   metadataBase: getAppUrl(),
-  title: 'Life clock',
-  description: 'See your mean lifespan like a clock',
+  title: {
+    default: 'Life Clock',
+    template: '%s | Life Clock',
+  },
+  description:
+    'A reflective life clock that visualizes your lifespan as a 24-hour clock.',
+  applicationName: 'Life Clock',
+  authors: [{ name: 'DenDeline', url: 'https://dendeline.com' }],
+  creator: 'DenDeline',
+  publisher: 'DenDeline',
+  category: 'lifestyle',
   openGraph: {
-    siteName: 'Life clock',
-    title: "Life clock - DenDeline's Pages",
-    description: 'See your mean lifespan like a clock',
+    siteName: 'Life Clock',
     locale: 'en_US',
     type: 'website',
-    url: '/',
   },
 }
 

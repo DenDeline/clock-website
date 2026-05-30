@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Life Clock
 
-## Getting Started
+Life Clock is a small reflective web app that turns a chosen lifespan into a
+24-hour clock. Add a start date and either an end age or end date, then the app
+shows where the current moment lands in that one-day view.
 
-First, run the development server:
+![Life Clock screenshot](public/readme-screenshot.png)
+
+## What It Does
+
+- Maps the time between your start and end dates onto a 24-hour clock.
+- Opens with a friendly setup dialog on first visit.
+- Stores your clock configuration in browser local storage.
+- Supports system, light, and dark color modes.
+- Serves localized routes for English, Russian, and Japanese.
+
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org/) with the App Router and static export
+- [React 19](https://react.dev/) and TypeScript
+- [MUI 9](https://mui.com/) with Emotion
+- [Dayjs](https://day.js.org/) for date calculations
+- [React Hook Form](https://react-hook-form.com/) and [Zod](https://zod.dev/)
+- [pnpm](https://pnpm.io/) for package management
+
+## Development Setup
+
+Use Node.js `24.16.0`, matching `.nvmrc`, and pnpm `11.4.0`, matching the
+`packageManager` field in `package.json`.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use
+corepack enable
+corepack prepare pnpm@11.4.0 --activate
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Start the local development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-## Learn More
+## Useful Commands
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Runs the Next.js development server.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm lint
+```
 
-## Deploy on Vercel
+Runs ESLint with the project configuration.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm build
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Builds the static production export into `out/`.
+
+```bash
+pnpm start
+```
+
+Serves the production build locally after `pnpm build`.
+
+## Static Export
+
+This project is configured for static hosting with `output: 'export'` in
+`next.config.ts`. GitHub Pages deployment is handled by the workflow in
+`.github/workflows/nextjs.yml`.

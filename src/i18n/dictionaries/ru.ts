@@ -172,6 +172,7 @@ const ru = {
       endDateRequired: 'Конечная дата обязательна',
       invalidDate: 'Некорректная дата',
       endAgePositive: 'Конечный возраст должен быть больше 0',
+      endDateAfterStart: 'Конечная дата должна быть позже даты рождения',
     },
     pwa: {
       updateAvailable: 'Доступна новая версия.',

@@ -169,6 +169,7 @@ const en = {
       endDateRequired: 'End date must not be empty',
       invalidDate: 'Invalid date',
       endAgePositive: 'End age must be greater than 0',
+      endDateAfterStart: 'End date must be after date of birth',
     },
     pwa: {
       updateAvailable: 'A new version is available.',

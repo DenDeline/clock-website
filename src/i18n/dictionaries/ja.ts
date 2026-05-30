@@ -170,6 +170,7 @@ const ja = {
       endDateRequired: '終了日を入力してください',
       invalidDate: '日付が正しくありません',
       endAgePositive: '終了年齢は0より大きい値にしてください',
+      endDateAfterStart: '終了日は生年月日より後の日付にしてください',
     },
     pwa: {
       updateAvailable: '新しいバージョンがあります。',

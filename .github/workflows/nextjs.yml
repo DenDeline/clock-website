@@ -43,7 +43,7 @@ jobs:
           cache: 'pnpm'
       - name: Setup Pages
         id: setup_pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Restore cache
         uses: actions/cache@v5
         with:
@@ -61,7 +61,7 @@ jobs:
         env:
           PAGES_BASE_PATH: ${{ steps.setup_pages.outputs.base_path }}
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./out
 
@@ -75,4 +75,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

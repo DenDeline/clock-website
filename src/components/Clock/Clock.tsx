@@ -1,6 +1,10 @@
 'use client'
 
-import { convertPercentageToTime, formatClockValue } from '@/utils/clock'
+import {
+  convertPercentageToTime,
+  convertToTwelveHourClock,
+  formatClockValue,
+} from '@/utils/clock'
 import { Typography } from '@mui/material'
 import dayjs, { type Dayjs } from 'dayjs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -8,9 +12,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 interface ClockProps {
   startDate: Dayjs
   endDate: Dayjs
+  useAmPm: boolean
 }
 
-function Clock({ startDate, endDate }: ClockProps) {
+function Clock({ startDate, endDate, useAmPm }: ClockProps) {
   const durationMs = useMemo(
     () => endDate.diff(startDate),
     [endDate, startDate],
@@ -30,7 +35,8 @@ function Clock({ startDate, endDate }: ClockProps) {
   const [displayDots, setDisplayDots] = useState(true)
 
   const { hours, minutes } = convertPercentageToTime(lifePercentage)
-  const clockHours = formatClockValue(hours)
+  const twelveHourClock = useAmPm ? convertToTwelveHourClock(hours) : null
+  const clockHours = formatClockValue(twelveHourClock?.hours ?? hours)
   const clockMinutes = formatClockValue(minutes)
 
   const intervalRef = useRef<number>(undefined)
@@ -55,6 +61,19 @@ function Clock({ startDate, endDate }: ClockProps) {
       <span>{clockHours}</span>
       <span style={{ visibility: displayDots ? 'visible' : 'hidden' }}>:</span>
       <span>{clockMinutes}</span>
+      {twelveHourClock && (
+        <Typography
+          component='span'
+          variant='h3'
+          sx={{
+            ml: { xs: 1, sm: 1.5 },
+            fontWeight: 700,
+            verticalAlign: 'baseline',
+          }}
+        >
+          {twelveHourClock.period}
+        </Typography>
+      )}
     </Typography>
   )
 }

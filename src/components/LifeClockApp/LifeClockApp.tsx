@@ -27,6 +27,7 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography,
@@ -46,6 +47,7 @@ type LifeClockAppMessages = Dictionary['app']
 function createFormSchema(messages: LifeClockAppMessages) {
   return z
     .object({
+      useAmPm: z.boolean(),
       startDate: z
         .custom<Dayjs>(dayjs.isDayjs, messages.validation.startDateRequired)
         .refine((val) => val.isValid(), {
@@ -79,6 +81,7 @@ type FormSchema = z.output<FormSchemaType>
 function createConfigSchema(messages: LifeClockAppMessages) {
   return z.object({
     variant: EndDateInputVariantEnum,
+    useAmPm: z.boolean().optional(),
     startDate: z
       .union([
         z.custom<Dayjs>(dayjs.isDayjs, messages.validation.startDateRequired),
@@ -96,6 +99,17 @@ function createConfigSchema(messages: LifeClockAppMessages) {
         message: messages.validation.invalidDate,
       }),
   })
+}
+
+function getBrowserDefaultUseAmPm() {
+  try {
+    return (
+      Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions()
+        .hour12 ?? false
+    )
+  } catch {
+    return false
+  }
 }
 
 function ColorModeSelector({
@@ -156,6 +170,7 @@ export default function LifeClockApp({
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null)
   const [endDate, setEndDate] = useState<Dayjs | null>(null)
+  const [useAmPm, setUseAmPm] = useState(false)
   const formSchema = useMemo(() => createFormSchema(messages), [messages])
   const configSchema = useMemo(() => createConfigSchema(messages), [messages])
 
@@ -167,9 +182,10 @@ export default function LifeClockApp({
     resolver: zodResolver(formSchema),
     defaultValues: {
       variant: endDateInputVariant,
-      startDate: startDate!,
+      useAmPm,
+      startDate: null as unknown as Dayjs,
       endAge: 76,
-      endDate: endDate!,
+      endDate: null as unknown as Dayjs,
     },
   })
 
@@ -177,6 +193,7 @@ export default function LifeClockApp({
     try {
       const config = JSON.parse(window.localStorage.getItem('config') || '{}')
       const result = configSchema.parse(config)
+      const useAmPm = result.useAmPm ?? getBrowserDefaultUseAmPm()
 
       // Local storage is only available after mount, so the persisted config has
       // to hydrate the client state from this effect.
@@ -184,9 +201,11 @@ export default function LifeClockApp({
       setEndDateInputVariant(result.variant)
       setStartDate(result.startDate)
       setEndDate(result.endDate)
+      setUseAmPm(useAmPm)
 
       reset({
         variant: result.variant,
+        useAmPm,
         startDate: result.startDate,
         endAge: result.endDate.diff(result.startDate, 'y'),
         endDate: result.endDate,
@@ -194,7 +213,16 @@ export default function LifeClockApp({
 
       setIsInitialized(true)
     } catch {
+      const useAmPm = getBrowserDefaultUseAmPm()
+
       window.localStorage.removeItem('config')
+      setUseAmPm(useAmPm)
+      reset({
+        variant: EndDateInputVariantEnum.enum.age,
+        useAmPm,
+        startDate: null as unknown as Dayjs,
+        endAge: 76,
+      })
       setIsConfigDialogOpen(true)
     }
   }, [configSchema, reset])
@@ -207,6 +235,7 @@ export default function LifeClockApp({
 
     const config = {
       variant: data.variant,
+      useAmPm: data.useAmPm,
       startDate: data.startDate.format('YYYY-MM-DD'),
       endDate: endDate.format('YYYY-MM-DD'),
     }
@@ -216,6 +245,7 @@ export default function LifeClockApp({
     setEndDateInputVariant(data.variant)
     setStartDate(data.startDate)
     setEndDate(endDate)
+    setUseAmPm(data.useAmPm)
 
     setIsConfigDialogOpen(false)
   }
@@ -225,11 +255,12 @@ export default function LifeClockApp({
 
     reset({
       variant: endDateInputVariant,
+      useAmPm,
       startDate: startDate!,
       endDate: endDate!,
       endAge: endDate!.diff(startDate, 'y'),
     })
-  }, [startDate, endDate, endDateInputVariant, reset])
+  }, [startDate, endDate, endDateInputVariant, reset, useAmPm])
 
   return (
     <>
@@ -309,7 +340,11 @@ export default function LifeClockApp({
       >
         <Fade in={Boolean(startDate && endDate)} mountOnEnter>
           <div>
-            <Clock startDate={startDate!} endDate={endDate!} />
+            <Clock
+              startDate={startDate!}
+              endDate={endDate!}
+              useAmPm={useAmPm}
+            />
           </div>
         </Fade>
       </Grid>
@@ -442,6 +477,25 @@ export default function LifeClockApp({
                   />
                 )}
               </>
+            )}
+          />
+          <Controller
+            name='useAmPm'
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={field.value}
+                    disabled={field.disabled}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    onChange={(event) => field.onChange(event.target.checked)}
+                  />
+                }
+                label={messages.form.useAmPm}
+                sx={{ display: 'flex', mt: 1 }}
+              />
             )}
           />
           <ColorModeSelector messages={messages} />

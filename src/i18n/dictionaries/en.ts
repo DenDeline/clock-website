@@ -147,6 +147,7 @@ const en = {
       date: 'Date',
       endAge: 'End age',
       endDate: 'End date',
+      useAmPm: 'Use AM/PM time',
       info: "We use your birthday to calculate how far you are along your life's clock. The mean lifespan helps us estimate the full 24-hour cycle. This information is only stored on your device and is not shared.",
     },
     validation: {

@@ -26,3 +26,10 @@ export function convertPercentageToTime(percentage: number) {
 export function formatClockValue(num: number): string {
   return ('0' + num).slice(-2)
 }
+
+export function convertToTwelveHourClock(hours: number) {
+  return {
+    hours: hours % 12 || 12,
+    period: hours < 12 ? 'AM' : 'PM',
+  }
+}

@@ -1,7 +1,7 @@
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import { DateField } from '@mui/x-date-pickers'
-import type { FormEventHandler } from 'react'
+import type { SubmitEventHandler } from 'react'
 import { Controller, type Control } from 'react-hook-form'
 
 import type { FormInput } from './schema'
@@ -14,7 +14,7 @@ export function OnboardingView({
 }: Readonly<{
   control: Control<FormInput>
   messages: LifeClockAppMessages
-  onSubmit: FormEventHandler<HTMLFormElement>
+  onSubmit: SubmitEventHandler<HTMLFormElement>
 }>) {
   return (
     <Box

@@ -121,6 +121,15 @@ const ja = {
   },
   app: {
     dateFormat: 'YYYY/MM/DD',
+    onboarding: {
+      eyebrow: '人生を24時間時計で見る',
+      title: 'Life Clock',
+      body: '生年月日を入力すると、人生をひとつのシンプルな1日として表示できます。',
+      birthDate: '生年月日',
+      getStarted: 'はじめる',
+      storageNote:
+        '入力した日付はこのブラウザ内にのみ保存され、サーバーへ送信されません。',
+    },
     colorMode: {
       label: 'カラーモード',
       system: 'システム',
@@ -146,7 +155,7 @@ const ja = {
       save: '保存',
     },
     form: {
-      startDate: '開始日',
+      startDate: '生年月日',
       endDateQuestion: '終了日はどのように計算しますか？',
       age: '年齢',
       date: '日付',
@@ -156,7 +165,8 @@ const ja = {
       info: '誕生日を使用して、人生の時計がどれくらい進んでいるかを計算します。平均寿命は、24時間サイクル全体を推定するために役立ちます。この情報はお使いの端末にのみ保存され、共有されません。',
     },
     validation: {
-      startDateRequired: '開始日を入力してください',
+      startDateRequired: '生年月日を入力してください',
+      startDateFuture: '生年月日は未来の日付にできません',
       endDateRequired: '終了日を入力してください',
       invalidDate: '日付が正しくありません',
       endAgePositive: '終了年齢は0より大きい値にしてください',

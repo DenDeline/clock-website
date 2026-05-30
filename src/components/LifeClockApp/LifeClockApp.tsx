@@ -8,6 +8,7 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 import SettingsIcon from '@mui/icons-material/Settings'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { useColorScheme, useTheme } from '@mui/material/styles'
 
 import {
@@ -57,6 +58,9 @@ function createFormSchema(messages: LifeClockAppMessages) {
         .custom<Dayjs>(dayjs.isDayjs, messages.validation.startDateRequired)
         .refine((val) => val.isValid(), {
           message: messages.validation.invalidDate,
+        })
+        .refine((val) => !val.isAfter(dayjs(), 'day'), {
+          message: messages.validation.startDateFuture,
         }),
     })
     .and(
@@ -96,6 +100,9 @@ function createConfigSchema(messages: LifeClockAppMessages) {
       ])
       .refine((val) => val.isValid(), {
         message: messages.validation.invalidDate,
+      })
+      .refine((val) => !val.isAfter(dayjs(), 'day'), {
+        message: messages.validation.startDateFuture,
       }),
     endDate: z
       .union([
@@ -116,6 +123,30 @@ function getBrowserDefaultUseAmPm() {
     )
   } catch {
     return false
+  }
+}
+
+function getStoredConfig() {
+  try {
+    return window.localStorage?.getItem('config') ?? null
+  } catch {
+    return null
+  }
+}
+
+function saveStoredConfig(config: unknown) {
+  try {
+    window.localStorage?.setItem('config', JSON.stringify(config))
+  } catch {
+    // The clock can still run for the current session when storage is blocked.
+  }
+}
+
+function clearStoredConfig() {
+  try {
+    window.localStorage?.removeItem('config')
+  } catch {
+    // Ignore unavailable storage and continue with a fresh setup.
   }
 }
 
@@ -170,6 +201,8 @@ export default function LifeClockApp({
 }: Readonly<{
   messages: LifeClockAppMessages
 }>) {
+  const defaultEndAge = 76
+  const [isConfigLoaded, setIsConfigLoaded] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('clock')
@@ -210,7 +243,7 @@ export default function LifeClockApp({
 
   useEffect(() => {
     try {
-      const config = JSON.parse(window.localStorage.getItem('config') || '{}')
+      const config = JSON.parse(getStoredConfig() || '{}')
       const result = configSchema.parse(config)
       const useAmPm = result.useAmPm ?? getBrowserDefaultUseAmPm()
 
@@ -231,21 +264,21 @@ export default function LifeClockApp({
       })
 
       setIsInitialized(true)
+      setActiveMobileTab('clock')
     } catch {
       const useAmPm = getBrowserDefaultUseAmPm()
 
-      window.localStorage.removeItem('config')
+      clearStoredConfig()
       setUseAmPm(useAmPm)
       reset({
         variant: EndDateInputVariantEnum.enum.age,
         useAmPm,
         startDate: null as unknown as Dayjs,
-        endAge: 76,
+        endAge: defaultEndAge,
       })
-      setActiveMobileTab('settings')
-      setIsConfigDialogOpen(!isMobile)
     }
-  }, [configSchema, isMobile, reset])
+    setIsConfigLoaded(true)
+  }, [configSchema, defaultEndAge, reset])
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
     const endDate =
@@ -260,7 +293,7 @@ export default function LifeClockApp({
       endDate: endDate.format('YYYY-MM-DD'),
     }
 
-    window.localStorage.setItem('config', JSON.stringify(config))
+    saveStoredConfig(config)
 
     setEndDateInputVariant(data.variant)
     setStartDate(data.startDate)
@@ -325,7 +358,10 @@ export default function LifeClockApp({
         <Controller
           name='startDate'
           control={control}
-          render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => (
+          render={({
+            field: { ref, ...fieldProps },
+            fieldState: { error },
+          }) => (
             <DateField
               {...fieldProps}
               inputRef={ref}
@@ -468,6 +504,139 @@ export default function LifeClockApp({
         )}
         <Button type='submit'>{messages.dialog.save}</Button>
       </DialogActions>
+    )
+  }
+
+  function renderBirthDateField(autoFocus: boolean) {
+    return (
+      <Controller
+        name='startDate'
+        control={control}
+        render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => (
+          <DateField
+            {...fieldProps}
+            inputRef={ref}
+            required
+            label={messages.onboarding.birthDate}
+            variant='outlined'
+            margin='none'
+            fullWidth
+            format={messages.dateFormat}
+            disableFuture
+            autoFocus={autoFocus}
+            slotProps={{
+              textField: {
+                error: !!error,
+                helperText: error?.message ?? messages.onboarding.storageNote,
+              },
+            }}
+          />
+        )}
+      />
+    )
+  }
+
+  if (!isConfigLoaded) {
+    return null
+  }
+
+  if (!isInitialized) {
+    return (
+      <Box
+        component='form'
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          minHeight: '100dvh',
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'hidden',
+          px: { xs: 3, sm: 6 },
+          py: { xs: 6, sm: 8 },
+          position: 'relative',
+          bgcolor: 'background.default',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background:
+              'radial-gradient(circle at 50% 12%, rgba(25, 118, 210, 0.18), transparent 34%), linear-gradient(180deg, rgba(25, 118, 210, 0.08), transparent 46%)',
+            pointerEvents: 'none',
+          },
+        }}
+      >
+        <Stack
+          spacing={{ xs: 4, sm: 5 }}
+          sx={{
+            position: 'relative',
+            zIndex: 1,
+            width: '100%',
+            maxWidth: 720,
+            mx: 'auto',
+            textAlign: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Box>
+            <Typography
+              component='p'
+              variant='overline'
+              color='primary'
+              sx={{ fontWeight: 700 }}
+            >
+              {messages.onboarding.eyebrow}
+            </Typography>
+            <Typography
+              component='h1'
+              variant='h1'
+              sx={{
+                mt: 1,
+                fontSize: { xs: '3.25rem', sm: '5rem', md: '6.5rem' },
+                lineHeight: 0.95,
+                fontWeight: 800,
+              }}
+            >
+              {messages.onboarding.title}
+            </Typography>
+            <Typography
+              variant='h5'
+              color='text.secondary'
+              sx={{
+                mt: 3,
+                mx: 'auto',
+                maxWidth: 600,
+                fontSize: { xs: '1.1rem', sm: '1.35rem' },
+                lineHeight: 1.45,
+              }}
+            >
+              {messages.onboarding.body}
+            </Typography>
+          </Box>
+
+          <Stack
+            spacing={2}
+            sx={{
+              width: '100%',
+              maxWidth: 420,
+            }}
+          >
+            {renderBirthDateField(true)}
+            <Button
+              type='submit'
+              variant='contained'
+              size='large'
+              endIcon={<PlayArrowIcon />}
+              sx={{
+                minHeight: 56,
+                borderRadius: 2,
+                fontWeight: 700,
+              }}
+            >
+              {messages.onboarding.getStarted}
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
     )
   }
 

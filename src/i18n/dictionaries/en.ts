@@ -119,6 +119,15 @@ const en = {
   },
   app: {
     dateFormat: 'DD/MM/YYYY',
+    onboarding: {
+      eyebrow: 'Life as a 24-hour clock',
+      title: 'Life Clock',
+      body: 'Enter your date of birth to see your life mapped onto one simple day.',
+      birthDate: 'Date of birth',
+      getStarted: 'Get started',
+      storageNote:
+        'The date you enter is saved in this browser only and is never sent to a server.',
+    },
     colorMode: {
       label: 'Color mode',
       system: 'System',
@@ -145,7 +154,7 @@ const en = {
       save: 'Save',
     },
     form: {
-      startDate: 'Start date',
+      startDate: 'Date of birth',
       endDateQuestion: 'How should the end date be calculated?',
       age: 'Age',
       date: 'Date',
@@ -155,7 +164,8 @@ const en = {
       info: "We use your birthday to calculate how far you are along your life's clock. The mean lifespan helps us estimate the full 24-hour cycle. This information is only stored on your device and is not shared.",
     },
     validation: {
-      startDateRequired: 'Start date must not be empty',
+      startDateRequired: 'Date of birth must not be empty',
+      startDateFuture: 'Date of birth must not be in the future',
       endDateRequired: 'End date must not be empty',
       invalidDate: 'Invalid date',
       endAgePositive: 'End age must be greater than 0',

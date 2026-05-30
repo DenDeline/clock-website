@@ -135,6 +135,10 @@ const ru = {
       showInterface: 'Показать интерфейс',
       toggleInterface: 'Переключить видимость интерфейса',
     },
+    tabs: {
+      clock: 'Часы',
+      settings: 'Настройки',
+    },
     dialog: {
       settingsTitle: 'Настройки',
       welcomeTitle: 'Добро пожаловать',

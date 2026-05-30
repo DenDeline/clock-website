@@ -136,6 +136,12 @@ export default function PwaUpdatePrompt({
     <Snackbar
       open={isUpdateReady}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      sx={{
+        bottom: {
+          xs: 'calc(72px + env(safe-area-inset-bottom))',
+          sm: 24,
+        },
+      }}
     >
       <Alert
         severity='info'

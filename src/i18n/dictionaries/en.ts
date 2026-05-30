@@ -132,6 +132,10 @@ const en = {
       showInterface: 'Show interface',
       toggleInterface: 'Toggle interface visibility',
     },
+    tabs: {
+      clock: 'Clock',
+      settings: 'Settings',
+    },
     dialog: {
       settingsTitle: 'Settings',
       welcomeTitle: 'Welcome',

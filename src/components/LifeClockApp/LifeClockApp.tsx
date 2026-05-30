@@ -3,15 +3,18 @@
 import { Clock } from '@/components'
 import type { Dictionary } from '@/i18n'
 import { zodResolver } from '@hookform/resolvers/zod'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import SettingsIcon from '@mui/icons-material/Settings'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import { useColorScheme } from '@mui/material/styles'
+import { useColorScheme, useTheme } from '@mui/material/styles'
 
 import {
   Alert,
   Box,
+  BottomNavigation,
+  BottomNavigationAction,
   Button,
   Dialog,
   DialogActions,
@@ -24,6 +27,7 @@ import {
   FormLabel,
   Grid,
   IconButton,
+  Paper,
   Radio,
   RadioGroup,
   Stack,
@@ -31,6 +35,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
 
 import { DateField } from '@mui/x-date-pickers'
@@ -78,6 +83,7 @@ type FormSchemaType = ReturnType<typeof createFormSchema>
 type FormInput = z.input<FormSchemaType>
 type FormSchema = z.output<FormSchemaType>
 type ColorMode = 'system' | 'light' | 'dark'
+type MobileTab = 'clock' | 'settings'
 
 function createConfigSchema(messages: LifeClockAppMessages) {
   return z.object({
@@ -166,7 +172,12 @@ export default function LifeClockApp({
 }>) {
   const [isInitialized, setIsInitialized] = useState(false)
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
+  const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('clock')
   const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'), {
+    noSsr: true,
+  })
   const { mode, setMode } = useColorScheme()
   const currentColorMode = mode as ColorMode | undefined
   const [originalColorMode, setOriginalColorMode] = useState<ColorMode>()
@@ -231,9 +242,10 @@ export default function LifeClockApp({
         startDate: null as unknown as Dayjs,
         endAge: 76,
       })
-      setIsConfigDialogOpen(true)
+      setActiveMobileTab('settings')
+      setIsConfigDialogOpen(!isMobile)
     }
-  }, [configSchema, reset])
+  }, [configSchema, isMobile, reset])
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
     const endDate =
@@ -256,6 +268,8 @@ export default function LifeClockApp({
     setUseAmPm(data.useAmPm)
     setOriginalColorMode(stagedColorMode ?? currentColorMode)
 
+    setIsInitialized(true)
+    setActiveMobileTab('clock')
     setIsConfigDialogOpen(false)
   }
 
@@ -289,6 +303,10 @@ export default function LifeClockApp({
   )
 
   const handleDialogExited = useCallback(() => {
+    if (!startDate || !endDate) {
+      return
+    }
+
     setIsInitialized(true)
 
     reset({
@@ -300,6 +318,159 @@ export default function LifeClockApp({
     })
   }, [startDate, endDate, endDateInputVariant, reset, useAmPm])
 
+  function renderSettingsFormFields(autoFocus: boolean) {
+    return (
+      <>
+        <Typography gutterBottom>{messages.dialog.intro}</Typography>
+        <Controller
+          name='startDate'
+          control={control}
+          render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => (
+            <DateField
+              {...fieldProps}
+              inputRef={ref}
+              required
+              label={messages.form.startDate}
+              variant='standard'
+              margin='dense'
+              fullWidth
+              format={messages.dateFormat}
+              disableFuture
+              autoFocus={autoFocus}
+              slotProps={{
+                textField: {
+                  error: !!error,
+                  helperText: error?.message,
+                },
+              }}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name='variant'
+          render={({ field, fieldState: { error } }) => (
+            <>
+              <FormControl error={!!error} margin='dense'>
+                <FormLabel id={endDateVariantInputId}>
+                  {messages.form.endDateQuestion}
+                </FormLabel>
+                <RadioGroup
+                  {...field}
+                  onTransitionEnd={() => {
+                    resetField('endDate')
+                    resetField('endAge')
+                  }}
+                  row
+                  aria-labelledby={endDateVariantInputId}
+                >
+                  <FormControlLabel
+                    value={EndDateInputVariantEnum.enum.age}
+                    control={<Radio />}
+                    label={messages.form.age}
+                  />
+                  <FormControlLabel
+                    value={EndDateInputVariantEnum.enum.date}
+                    control={<Radio />}
+                    label={messages.form.date}
+                  />
+                </RadioGroup>
+                <FormHelperText>{error?.message}</FormHelperText>
+              </FormControl>
+              {field.value === 'age' ? (
+                <Controller
+                  key={'.01'}
+                  name={'endAge'}
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      required
+                      label={messages.form.endAge}
+                      variant='standard'
+                      type='number'
+                      margin='dense'
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              ) : (
+                <Controller
+                  key={'.02'}
+                  name={'endDate'}
+                  control={control}
+                  render={({
+                    field: { ref, ...fieldProps },
+                    fieldState: { error },
+                  }) => (
+                    <DateField
+                      {...fieldProps}
+                      inputRef={ref}
+                      required
+                      label={messages.form.endDate}
+                      variant='standard'
+                      margin='dense'
+                      fullWidth
+                      sx={{ mb: 2 }}
+                      format={messages.dateFormat}
+                      slotProps={{
+                        textField: {
+                          error: !!error,
+                          helperText: error?.message,
+                        },
+                      }}
+                    />
+                  )}
+                />
+              )}
+            </>
+          )}
+        />
+        <Controller
+          name='useAmPm'
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={field.value}
+                  disabled={field.disabled}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  onChange={(event) => field.onChange(event.target.checked)}
+                />
+              }
+              label={messages.form.useAmPm}
+              sx={{ display: 'flex', mt: 1 }}
+            />
+          )}
+        />
+        <ColorModeSelector
+          mode={stagedColorMode ?? currentColorMode}
+          messages={messages}
+          onModeChange={handleColorModeChange}
+        />
+        <Alert severity='info'>{messages.form.info}</Alert>
+      </>
+    )
+  }
+
+  function renderSettingsActions(includeClose: boolean) {
+    return (
+      <DialogActions sx={includeClose ? undefined : { px: 0 }}>
+        {includeClose && (
+          <Button onClick={handleCloseConfigDialog}>
+            {messages.dialog.close}
+          </Button>
+        )}
+        <Button type='submit'>{messages.dialog.save}</Button>
+      </DialogActions>
+    )
+  }
+
   return (
     <>
       <Box
@@ -307,6 +478,7 @@ export default function LifeClockApp({
           position: 'absolute',
           bottom: 16,
           right: 16,
+          display: { xs: 'none', sm: 'block' },
         }}
       >
         <Stack spacing={1}>
@@ -369,6 +541,14 @@ export default function LifeClockApp({
         container
         sx={{
           height: '100dvh',
+          display: {
+            xs: activeMobileTab === 'clock' ? 'flex' : 'none',
+            sm: 'flex',
+          },
+          pb: {
+            xs: 'calc(80px + env(safe-area-inset-bottom))',
+            sm: 0,
+          },
           justifyContent: 'center',
           alignItems: 'center',
         }}
@@ -383,6 +563,64 @@ export default function LifeClockApp({
           </div>
         </Fade>
       </Grid>
+      <Box
+        component='form'
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          display: {
+            xs: activeMobileTab === 'settings' ? 'block' : 'none',
+            sm: 'none',
+          },
+          minHeight: '100dvh',
+          overflowY: 'auto',
+          px: 3,
+          pt: 4,
+          pb: 'calc(96px + env(safe-area-inset-bottom))',
+        }}
+      >
+        <Typography component='h1' variant='h5' gutterBottom>
+          {isInitialized
+            ? messages.dialog.settingsTitle
+            : messages.dialog.welcomeTitle}
+        </Typography>
+        {renderSettingsFormFields(false)}
+        {renderSettingsActions(false)}
+      </Box>
+
+      <Paper
+        elevation={8}
+        sx={{
+          position: 'fixed',
+          right: 0,
+          bottom: 0,
+          left: 0,
+          zIndex: (theme) => theme.zIndex.appBar,
+          display: { xs: 'block', sm: 'none' },
+          // borderTop: '1px solid',
+          // borderColor: 'divider',
+          pb: 'env(safe-area-inset-bottom)',
+        }}
+      >
+        <BottomNavigation
+          showLabels
+          value={activeMobileTab}
+          onChange={(_, value: MobileTab) => {
+            setActiveMobileTab(value)
+          }}
+        >
+          <BottomNavigationAction
+            label={messages.tabs.clock}
+            value='clock'
+            icon={<AccessTimeIcon />}
+          />
+          <BottomNavigationAction
+            label={messages.tabs.settings}
+            value='settings'
+            icon={<SettingsIcon />}
+          />
+        </BottomNavigation>
+      </Paper>
       <Dialog
         open={isConfigDialogOpen}
         onSubmit={handleSubmit(onSubmit)}
@@ -403,151 +641,9 @@ export default function LifeClockApp({
             : messages.dialog.welcomeTitle}
         </DialogTitle>
         <DialogContent dividers>
-          <Typography gutterBottom>{messages.dialog.intro}</Typography>
-          <Controller
-            name='startDate'
-            control={control}
-            render={({
-              field: { ref, ...fieldProps },
-              fieldState: { error },
-            }) => (
-              <DateField
-                {...fieldProps}
-                inputRef={ref}
-                required
-                label={messages.form.startDate}
-                variant='standard'
-                margin='dense'
-                fullWidth
-                format={messages.dateFormat}
-                disableFuture
-                autoFocus={!isInitialized}
-                slotProps={{
-                  textField: {
-                    error: !!error,
-                    helperText: error?.message,
-                  },
-                }}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name='variant'
-            render={({ field, fieldState: { error } }) => (
-              <>
-                <FormControl error={!!error} margin='dense'>
-                  <FormLabel id={endDateVariantInputId}>
-                    {messages.form.endDateQuestion}
-                  </FormLabel>
-                  <RadioGroup
-                    {...field}
-                    onTransitionEnd={() => {
-                      resetField('endDate')
-                      resetField('endAge')
-                    }}
-                    row
-                    aria-labelledby={endDateVariantInputId}
-                  >
-                    <FormControlLabel
-                      value={EndDateInputVariantEnum.enum.age}
-                      control={<Radio />}
-                      label={messages.form.age}
-                    />
-                    <FormControlLabel
-                      value={EndDateInputVariantEnum.enum.date}
-                      control={<Radio />}
-                      label={messages.form.date}
-                    />
-                  </RadioGroup>
-                  <FormHelperText>{error?.message}</FormHelperText>
-                </FormControl>
-                {field.value === 'age' ? (
-                  <Controller
-                    key={'.01'}
-                    name={'endAge'}
-                    control={control}
-                    render={({ field, fieldState: { error } }) => (
-                      <TextField
-                        {...field}
-                        required
-                        label={messages.form.endAge}
-                        variant='standard'
-                        type='number'
-                        margin='dense'
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        error={!!error}
-                        helperText={error?.message}
-                      />
-                    )}
-                  />
-                ) : (
-                  <Controller
-                    key={'.02'}
-                    name={'endDate'}
-                    control={control}
-                    render={({
-                      field: { ref, ...fieldProps },
-                      fieldState: { error },
-                    }) => (
-                      <DateField
-                        {...fieldProps}
-                        inputRef={ref}
-                        required
-                        label={messages.form.endDate}
-                        variant='standard'
-                        margin='dense'
-                        fullWidth
-                        sx={{ mb: 2 }}
-                        format={messages.dateFormat}
-                        slotProps={{
-                          textField: {
-                            error: !!error,
-                            helperText: error?.message,
-                          },
-                        }}
-                      />
-                    )}
-                  />
-                )}
-              </>
-            )}
-          />
-          <Controller
-            name='useAmPm'
-            control={control}
-            render={({ field }) => (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={field.value}
-                    disabled={field.disabled}
-                    name={field.name}
-                    onBlur={field.onBlur}
-                    onChange={(event) => field.onChange(event.target.checked)}
-                  />
-                }
-                label={messages.form.useAmPm}
-                sx={{ display: 'flex', mt: 1 }}
-              />
-            )}
-          />
-          <ColorModeSelector
-            mode={stagedColorMode ?? currentColorMode}
-            messages={messages}
-            onModeChange={handleColorModeChange}
-          />
-          <Alert severity='info'>{messages.form.info}</Alert>
+          {renderSettingsFormFields(!isInitialized && !isMobile)}
         </DialogContent>
-        <DialogActions>
-          {isInitialized && (
-            <Button onClick={handleCloseConfigDialog}>
-              {messages.dialog.close}
-            </Button>
-          )}
-          <Button type='submit'>{messages.dialog.save}</Button>
-        </DialogActions>
+        {renderSettingsActions(isInitialized)}
       </Dialog>
     </>
   )

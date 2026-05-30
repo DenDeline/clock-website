@@ -134,6 +134,10 @@ const ja = {
       showInterface: 'インターフェースを表示',
       toggleInterface: 'インターフェース表示を切り替え',
     },
+    tabs: {
+      clock: '時計',
+      settings: '設定',
+    },
     dialog: {
       settingsTitle: '設定',
       welcomeTitle: 'ようこそ',

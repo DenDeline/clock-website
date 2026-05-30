@@ -129,6 +129,7 @@ const ja = {
     },
     controls: {
       settings: '設定',
+      sourceCode: 'ソースコード',
       hideInterface: 'インターフェースを非表示',
       showInterface: 'インターフェースを表示',
       toggleInterface: 'インターフェース表示を切り替え',

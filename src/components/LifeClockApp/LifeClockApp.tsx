@@ -3,6 +3,7 @@
 import { Clock } from '@/components'
 import type { Dictionary } from '@/i18n'
 import { zodResolver } from '@hookform/resolvers/zod'
+import GitHubIcon from '@mui/icons-material/GitHub'
 import SettingsIcon from '@mui/icons-material/Settings'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
@@ -253,6 +254,26 @@ export default function LifeClockApp({
                 onClick={() => setIsConfigDialogOpen(true)}
               >
                 <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+          </Fade>
+          <Fade in={isInterfaceVisible} appear={false}>
+            <Tooltip
+              title={messages.controls.sourceCode}
+              placement='left'
+              arrow
+              enterDelay={200}
+              enterNextDelay={200}
+            >
+              <IconButton
+                aria-label={messages.controls.sourceCode}
+                component='a'
+                href='https://github.com/DenDeline/clock-website'
+                rel='noopener noreferrer'
+                size='small'
+                target='_blank'
+              >
+                <GitHubIcon />
               </IconButton>
             </Tooltip>
           </Fade>

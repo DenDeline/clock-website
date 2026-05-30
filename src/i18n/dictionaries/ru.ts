@@ -130,6 +130,7 @@ const ru = {
     },
     controls: {
       settings: 'Настройки',
+      sourceCode: 'Исходный код',
       hideInterface: 'Скрыть интерфейс',
       showInterface: 'Показать интерфейс',
       toggleInterface: 'Переключить видимость интерфейса',

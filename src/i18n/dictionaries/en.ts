@@ -127,6 +127,7 @@ const en = {
     },
     controls: {
       settings: 'Settings',
+      sourceCode: 'Source code',
       hideInterface: 'Hide interface',
       showInterface: 'Show interface',
       toggleInterface: 'Toggle interface visibility',

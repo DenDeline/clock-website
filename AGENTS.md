@@ -49,3 +49,10 @@ Keep edits scoped and consistent with the existing App Router structure and stat
 When working on Next.js behavior, use the project-level Next.js DevTools MCP integration when it is available. Call the `next-devtools-mcp` `init` tool first to establish current Next.js context, and use `nextjs_docs` for framework and API questions instead of relying on stale assumptions. When `pnpm dev` is running, use `nextjs_index` to discover the active dev server, then use `nextjs_call` for runtime tools such as `get_errors`, `get_logs`, `get_page_metadata`, and `get_project_metadata`.
 
 Prefer MCP runtime diagnostics before guessing about hydration, routing, metadata, build, or runtime errors. For UI verification, use browser tooling after MCP diagnostics or when visual interaction and screenshots are specifically needed.
+
+## Use the mui-mcp server to answer any MUI questions --
+
+- 1. call the "useMuiDocs" tool to fetch the docs of the package relevant in the question
+- 2. call the "fetchDocs" tool to fetch any additional docs if needed using ONLY the URLs present in the returned content.
+- 3. repeat steps 1-2 until you have fetched all relevant docs for the given question
+- 4. use the fetched content to answer the question

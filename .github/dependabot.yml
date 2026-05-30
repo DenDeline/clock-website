@@ -9,6 +9,8 @@ updates:
       time: '08:00'
       timezone: 'Europe/Minsk'
     open-pull-requests-limit: 3
+    cooldown:
+      default-days: 14
     groups:
       npm-dependencies:
         patterns:
@@ -22,6 +24,8 @@ updates:
       time: '08:30'
       timezone: 'Europe/Minsk'
     open-pull-requests-limit: 3
+    cooldown:
+      default-days: 14
     groups:
       github-actions:
         patterns:

@@ -77,6 +77,7 @@ function createFormSchema(messages: LifeClockAppMessages) {
 type FormSchemaType = ReturnType<typeof createFormSchema>
 type FormInput = z.input<FormSchemaType>
 type FormSchema = z.output<FormSchemaType>
+type ColorMode = 'system' | 'light' | 'dark'
 
 function createConfigSchema(messages: LifeClockAppMessages) {
   return z.object({
@@ -113,12 +114,15 @@ function getBrowserDefaultUseAmPm() {
 }
 
 function ColorModeSelector({
+  mode,
   messages,
+  onModeChange,
 }: Readonly<{
+  mode?: ColorMode
   messages: LifeClockAppMessages
+  onModeChange: (mode: ColorMode) => void
 }>) {
   const colorModeInputId = useId()
-  const { mode, setMode } = useColorScheme()
 
   if (!mode) {
     return null
@@ -132,7 +136,7 @@ function ColorModeSelector({
         aria-labelledby={colorModeInputId}
         value={mode}
         onChange={(event) => {
-          setMode(event.target.value as 'system' | 'light' | 'dark')
+          onModeChange(event.target.value as ColorMode)
         }}
       >
         <FormControlLabel
@@ -163,6 +167,10 @@ export default function LifeClockApp({
   const [isInitialized, setIsInitialized] = useState(false)
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
+  const { mode, setMode } = useColorScheme()
+  const currentColorMode = mode as ColorMode | undefined
+  const [originalColorMode, setOriginalColorMode] = useState<ColorMode>()
+  const [stagedColorMode, setStagedColorMode] = useState<ColorMode>()
 
   const endDateVariantInputId = useId()
   const [endDateInputVariant, setEndDateInputVariant] =
@@ -246,9 +254,39 @@ export default function LifeClockApp({
     setStartDate(data.startDate)
     setEndDate(endDate)
     setUseAmPm(data.useAmPm)
+    setOriginalColorMode(stagedColorMode ?? currentColorMode)
 
     setIsConfigDialogOpen(false)
   }
+
+  const handleOpenConfigDialog = useCallback(() => {
+    if (currentColorMode) {
+      setOriginalColorMode(currentColorMode)
+      setStagedColorMode(currentColorMode)
+    }
+
+    setIsConfigDialogOpen(true)
+  }, [currentColorMode])
+
+  const handleCloseConfigDialog = useCallback(() => {
+    const colorMode = originalColorMode ?? currentColorMode
+
+    if (colorMode) {
+      setMode(colorMode)
+      setStagedColorMode(colorMode)
+    }
+
+    setIsConfigDialogOpen(false)
+  }, [currentColorMode, originalColorMode, setMode])
+
+  const handleColorModeChange = useCallback(
+    (colorMode: ColorMode) => {
+      setOriginalColorMode((value) => value ?? currentColorMode ?? colorMode)
+      setStagedColorMode(colorMode)
+      setMode(colorMode)
+    },
+    [currentColorMode, setMode],
+  )
 
   const handleDialogExited = useCallback(() => {
     setIsInitialized(true)
@@ -280,10 +318,7 @@ export default function LifeClockApp({
               enterDelay={200}
               enterNextDelay={200}
             >
-              <IconButton
-                size='small'
-                onClick={() => setIsConfigDialogOpen(true)}
-              >
+              <IconButton size='small' onClick={handleOpenConfigDialog}>
                 <SettingsIcon />
               </IconButton>
             </Tooltip>
@@ -360,7 +395,7 @@ export default function LifeClockApp({
             onExited: handleDialogExited,
           },
         }}
-        onClose={isInitialized ? () => setIsConfigDialogOpen(false) : undefined}
+        onClose={isInitialized ? handleCloseConfigDialog : undefined}
       >
         <DialogTitle>
           {isInitialized
@@ -498,12 +533,16 @@ export default function LifeClockApp({
               />
             )}
           />
-          <ColorModeSelector messages={messages} />
+          <ColorModeSelector
+            mode={stagedColorMode ?? currentColorMode}
+            messages={messages}
+            onModeChange={handleColorModeChange}
+          />
           <Alert severity='info'>{messages.form.info}</Alert>
         </DialogContent>
         <DialogActions>
           {isInitialized && (
-            <Button onClick={() => setIsConfigDialogOpen(false)}>
+            <Button onClick={handleCloseConfigDialog}>
               {messages.dialog.close}
             </Button>
           )}

@@ -7,6 +7,7 @@ import {
   type Locale,
   type RoutePath,
 } from '@/i18n'
+import { withBasePath } from '@/utils/base-path'
 import { getAppUrl } from '@/utils/urls'
 import type { Metadata } from 'next'
 
@@ -53,6 +54,9 @@ export function createRootMetadata(locale: Locale): Metadata {
     creator: dictionary.site.author,
     publisher: dictionary.site.author,
     category: dictionary.site.category,
+    icons: {
+      apple: withBasePath('/apple-touch-icon.png'),
+    },
     openGraph: {
       siteName: dictionary.site.name,
       locale: dictionary.locale.openGraph,

@@ -157,6 +157,11 @@ const ja = {
       invalidDate: '日付が正しくありません',
       endAgePositive: '終了年齢は0より大きい値にしてください',
     },
+    pwa: {
+      updateAvailable: '新しいバージョンがあります。',
+      update: '更新',
+      later: '後で',
+    },
   },
 } as const satisfies Dictionary
 

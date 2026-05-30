@@ -159,6 +159,11 @@ const ru = {
       invalidDate: 'Некорректная дата',
       endAgePositive: 'Конечный возраст должен быть больше 0',
     },
+    pwa: {
+      updateAvailable: 'Доступна новая версия.',
+      update: 'Обновить',
+      later: 'Позже',
+    },
   },
 } as const satisfies Dictionary
 

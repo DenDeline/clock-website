@@ -156,6 +156,11 @@ const en = {
       invalidDate: 'Invalid date',
       endAgePositive: 'End age must be greater than 0',
     },
+    pwa: {
+      updateAvailable: 'A new version is available.',
+      update: 'Update',
+      later: 'Later',
+    },
   },
 } as const
 

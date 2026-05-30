@@ -20,7 +20,7 @@ export function ClockScreen({
           sm: 'flex',
         },
         pb: {
-          xs: 'calc(80px + env(safe-area-inset-bottom))',
+          xs: 'calc(104px + env(safe-area-inset-bottom))',
           sm: 0,
         },
         justifyContent: 'center',

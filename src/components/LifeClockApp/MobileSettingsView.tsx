@@ -32,7 +32,7 @@ export function MobileSettingsView({
         overflowY: 'auto',
         px: 3,
         pt: 4,
-        pb: 'calc(96px + env(safe-area-inset-bottom))',
+        pb: 'calc(120px + env(safe-area-inset-bottom))',
       }}
     >
       <Typography component='h1' variant='h5' gutterBottom>

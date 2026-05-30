@@ -138,7 +138,7 @@ export default function PwaUpdatePrompt({
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       sx={{
         bottom: {
-          xs: 'calc(72px + env(safe-area-inset-bottom))',
+          xs: 'calc(96px + env(safe-area-inset-bottom))',
           sm: 24,
         },
       }}

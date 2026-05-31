@@ -1,9 +1,9 @@
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { Box, Button, Stack, Typography } from '@mui/material'
+import { DateField } from '@mui/x-date-pickers'
 import type { SubmitEventHandler } from 'react'
 import { Controller, type Control } from 'react-hook-form'
 
-import { ResponsiveDateField } from './ResponsiveDateField'
 import type { FormInput } from './schema'
 import type { LifeClockAppMessages } from './types'
 
@@ -102,7 +102,7 @@ export function OnboardingView({
               field: { ref, ...fieldProps },
               fieldState: { error },
             }) => (
-              <ResponsiveDateField
+              <DateField
                 {...fieldProps}
                 inputRef={ref}
                 required
@@ -113,8 +113,13 @@ export function OnboardingView({
                 format={messages.dateFormat}
                 disableFuture
                 autoFocus
-                error={!!error}
-                helperText={error?.message ?? messages.onboarding.storageNote}
+                slotProps={{
+                  textField: {
+                    error: !!error,
+                    helperText:
+                      error?.message ?? messages.onboarding.storageNote,
+                  },
+                }}
               />
             )}
           />

@@ -10,11 +10,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { DateField } from '@mui/x-date-pickers'
 import { Controller, type Control } from 'react-hook-form'
 
 import { EndDateInputVariantEnum, type FormInput } from './schema'
 import { ColorModeSelector } from './ColorModeSelector'
+import { ResponsiveDateField } from './ResponsiveDateField'
 import type {
   ColorMode,
   EndDateInputVariant,
@@ -45,7 +45,7 @@ export function SettingsForm({
         name='startDate'
         control={control}
         render={({ field: { ref, ...fieldProps }, fieldState: { error } }) => (
-          <DateField
+          <ResponsiveDateField
             {...fieldProps}
             inputRef={ref}
             required
@@ -56,12 +56,8 @@ export function SettingsForm({
             format={messages.dateFormat}
             disableFuture
             autoFocus={autoFocus}
-            slotProps={{
-              textField: {
-                error: !!error,
-                helperText: error?.message,
-              },
-            }}
+            error={!!error}
+            helperText={error?.message}
           />
         )}
       />
@@ -129,7 +125,7 @@ export function SettingsForm({
                   field: { ref, ...fieldProps },
                   fieldState: { error },
                 }) => (
-                  <DateField
+                  <ResponsiveDateField
                     {...fieldProps}
                     inputRef={ref}
                     required
@@ -139,12 +135,8 @@ export function SettingsForm({
                     fullWidth
                     sx={{ mb: 2 }}
                     format={messages.dateFormat}
-                    slotProps={{
-                      textField: {
-                        error: !!error,
-                        helperText: error?.message,
-                      },
-                    }}
+                    error={!!error}
+                    helperText={error?.message}
                   />
                 )}
               />

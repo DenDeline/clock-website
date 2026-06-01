@@ -110,7 +110,6 @@ export function OnboardingView({
                 fullWidth
                 format={messages.dateFormat}
                 disableFuture
-                autoFocus
                 slotProps={{
                   textField: {
                     error: !!error,

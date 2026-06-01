@@ -1,17 +1,18 @@
 'use client'
 
-import { createTheme } from '@mui/material/styles'
+import { createTheme, type ThemeOptions } from '@mui/material/styles'
 import {
   jaJP as materialJaJP,
   ruRU as materialRuRU,
 } from '@mui/material/locale'
 import type { Locale } from '@/i18n'
 
-const themeOptions = {
+const themeOptions: ThemeOptions = {
   cssVariables: {
     colorSchemeSelector: 'data',
   },
   colorSchemes: {
+    light: true,
     dark: true,
   },
   typography: {

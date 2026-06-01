@@ -19,26 +19,6 @@ const en = {
       description:
         'A reflective life clock that turns your lifespan into a 24-hour view, helping you see time, progress, and perspective at a glance.',
       ariaLabel: 'Interactive life clock',
-      intro: {
-        title: 'Life Clock',
-        body: 'Life Clock is a reflective tool that visualizes your life as a 24-hour clock. Add a starting date and an estimated endpoint to see where the current moment sits in a simple daily rhythm.',
-      },
-      sections: [
-        {
-          title: 'What it shows',
-          body: 'The clock maps the time between your chosen start and end dates onto one full day. It is designed for perspective, not prediction, so the result works best as a calm visual reminder of time passing.',
-        },
-        {
-          title: 'How it works',
-          body: 'Choose a birth date or another meaningful start date, then enter either an end age or an exact end date. The app calculates your progress through that span and displays it as the current time on a 24-hour clock face.',
-        },
-      ],
-      privacy: {
-        title: 'Privacy',
-        beforeLink:
-          'Your dates stay in your browser. Life Clock stores the configuration locally on your device so the clock can reopen with the same settings, and it does not send those dates to a server. Read the full',
-        link: 'Privacy Policy',
-      },
     },
     privacy: {
       title: 'Privacy Policy | Life Clock',

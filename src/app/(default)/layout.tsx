@@ -1,11 +1,11 @@
 import AppRootLayout from '../_components/AppRootLayout'
 import { createRootMetadata } from '../_lib/seo'
 import { defaultLocale, getDictionary } from '@/i18n'
-import type { Viewport } from 'next'
+import type { Viewport, Metadata } from 'next'
 
 const dictionary = getDictionary(defaultLocale)
 
-export const metadata = createRootMetadata(defaultLocale)
+export const metadata: Metadata = createRootMetadata(defaultLocale)
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,

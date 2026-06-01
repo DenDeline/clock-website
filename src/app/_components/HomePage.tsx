@@ -1,13 +1,7 @@
 import LifeClockApp from '@/components/LifeClockApp'
-import {
-  getDictionary,
-  getLocalizedPath,
-  getLocalizedUrl,
-  type Locale,
-} from '@/i18n'
+import { getDictionary, getLocalizedUrl, type Locale } from '@/i18n'
 import { getAppUrl } from '@/utils/urls'
-import { Box, Container, Stack, Typography } from '@mui/material'
-import NextLink from 'next/link'
+import { Box } from '@mui/material'
 
 export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
   const dictionary = getDictionary(locale)
@@ -48,7 +42,9 @@ export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
     <>
       <script
         type='application/ld+json'
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
       />
       <Box component='main'>
         <Box
@@ -57,59 +53,6 @@ export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
           sx={{ position: 'relative', minHeight: '100dvh' }}
         >
           <LifeClockApp messages={dictionary.app} />
-        </Box>
-
-        <Box
-          component='section'
-          sx={{
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'background.default',
-            py: { xs: 6, md: 10 },
-          }}
-        >
-          <Container maxWidth='md'>
-            <Stack spacing={4}>
-              <Box>
-                <Typography component='h1' variant='h3' gutterBottom>
-                  {page.intro.title}
-                </Typography>
-                <Typography variant='body1' color='text.secondary'>
-                  {page.intro.body}
-                </Typography>
-              </Box>
-
-              {page.sections.map((section) => (
-                <Box key={section.title}>
-                  <Typography component='h2' variant='h5' gutterBottom>
-                    {section.title}
-                  </Typography>
-                  <Typography variant='body1' color='text.secondary'>
-                    {section.body}
-                  </Typography>
-                </Box>
-              ))}
-
-              <Box>
-                <Typography component='h2' variant='h5' gutterBottom>
-                  {page.privacy.title}
-                </Typography>
-                <Typography variant='body1' color='text.secondary'>
-                  {page.privacy.beforeLink}{' '}
-                  <NextLink
-                    href={getLocalizedPath('/privacy', locale)}
-                    style={{
-                      color: 'var(--mui-palette-primary-main)',
-                      textDecoration: 'underline',
-                    }}
-                  >
-                    {page.privacy.link}
-                  </NextLink>
-                  .
-                </Typography>
-              </Box>
-            </Stack>
-          </Container>
         </Box>
       </Box>
     </>

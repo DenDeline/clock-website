@@ -30,7 +30,7 @@ export default function AppRootLayout({
   return (
     <html lang={lang} prefix='og: https://ogp.me/ns#' suppressHydrationWarning>
       <body className={roboto.variable}>
-        <InitColorSchemeScript defaultMode='system' />
+        <InitColorSchemeScript attribute='data' />
         <WebVitals />
         <AppRouterCacheProvider>
           <Providers locale={locale}>{children}</Providers>

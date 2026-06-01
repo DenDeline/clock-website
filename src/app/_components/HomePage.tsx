@@ -50,7 +50,10 @@ export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
         <Box
           component='section'
           aria-label={page.ariaLabel}
-          sx={{ position: 'relative', minHeight: '100dvh' }}
+          sx={{
+            position: 'relative',
+            minHeight: 'var(--life-app-height, 100dvh)',
+          }}
         >
           <LifeClockApp messages={dictionary.app} />
         </Box>

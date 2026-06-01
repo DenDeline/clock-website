@@ -22,7 +22,7 @@ export function OnboardingView({
       noValidate
       onSubmit={onSubmit}
       sx={{
-        minHeight: '100dvh',
+        minHeight: 'var(--life-app-height, 100dvh)',
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',

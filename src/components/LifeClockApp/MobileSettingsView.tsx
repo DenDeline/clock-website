@@ -28,7 +28,7 @@ export function MobileSettingsView({
           xs: activeMobileTab === 'settings' ? 'block' : 'none',
           sm: 'none',
         },
-        minHeight: '100dvh',
+        minHeight: 'var(--life-app-height, 100dvh)',
         overflowY: 'auto',
         px: 3,
         pt: 'calc(32px + env(safe-area-inset-top))',

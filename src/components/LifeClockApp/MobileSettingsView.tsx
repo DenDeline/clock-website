@@ -31,7 +31,7 @@ export function MobileSettingsView({
         minHeight: '100dvh',
         overflowY: 'auto',
         px: 3,
-        pt: 4,
+        pt: 'calc(32px + env(safe-area-inset-top))',
         pb: 'calc(120px + env(safe-area-inset-bottom))',
       }}
     >

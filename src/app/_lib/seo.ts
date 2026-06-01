@@ -50,6 +50,14 @@ export function createRootMetadata(locale: Locale): Metadata {
     },
     description: dictionary.site.description,
     applicationName: dictionary.site.name,
+    appleWebApp: {
+      capable: true,
+      title: dictionary.site.name,
+      statusBarStyle: 'black-translucent',
+    },
+    other: {
+      'apple-mobile-web-app-capable': 'yes',
+    },
     authors: [{ name: dictionary.site.author, url: dictionary.site.authorUrl }],
     creator: dictionary.site.author,
     publisher: dictionary.site.author,

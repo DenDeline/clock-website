@@ -19,6 +19,10 @@ export function ClockScreen({
           xs: activeMobileTab === 'clock' ? 'flex' : 'none',
           sm: 'flex',
         },
+        pt: {
+          xs: 'env(safe-area-inset-top)',
+          sm: 0,
+        },
         pb: {
           xs: 'calc(104px + env(safe-area-inset-bottom))',
           sm: 0,

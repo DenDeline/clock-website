@@ -27,24 +27,22 @@ export function OnboardingView({
         alignItems: 'center',
         overflow: 'hidden',
         px: { xs: 3, sm: 6 },
-        py: { xs: 6, sm: 8 },
-        position: 'relative',
-        bgcolor: 'background.default',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at 50% 12%, rgba(25, 118, 210, 0.18), transparent 34%), linear-gradient(180deg, rgba(25, 118, 210, 0.08), transparent 46%)',
-          pointerEvents: 'none',
+        pt: {
+          xs: 'calc(48px + env(safe-area-inset-top))',
+          sm: 8,
         },
+        pb: {
+          xs: 'calc(48px + env(safe-area-inset-bottom))',
+          sm: 8,
+        },
+        bgcolor: 'background.default',
+        backgroundImage:
+          'radial-gradient(circle at 50% 12%, rgba(25, 118, 210, 0.18), transparent 34%), linear-gradient(180deg, rgba(25, 118, 210, 0.08), transparent 46%)',
       }}
     >
       <Stack
         spacing={{ xs: 4, sm: 5 }}
         sx={{
-          position: 'relative',
-          zIndex: 1,
           width: '100%',
           maxWidth: 720,
           mx: 'auto',

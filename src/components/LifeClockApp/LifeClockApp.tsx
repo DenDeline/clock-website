@@ -1,39 +1,33 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  useMediaQuery,
-} from '@mui/material'
-import { useTheme } from '@mui/material/styles'
-import { useCallback, useEffect, useId, useMemo, useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useColorScheme } from '@mui/material/styles'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type SubmitHandler, useForm, useWatch } from 'react-hook-form'
 
 import type { Locale } from '@/i18n'
 
 import { ClockScreen } from './ClockScreen'
 import { DesktopControls } from './DesktopControls'
 import { MobileNavigation } from './MobileNavigation'
-import { MobileSettingsView } from './MobileSettingsView'
 import { OnboardingView } from './OnboardingView'
 import {
   createEmptyFormValues,
   createFormSchema,
   EndDateInputVariantEnum,
+  getEndDateFromFormData,
   type FormInput,
   type FormSchema,
 } from './schema'
-import { SettingsActions } from './SettingsActions'
 import { SettingsForm } from './SettingsForm'
+import { SettingsScreen } from './SettingsScreen'
 import type {
+  ColorMode,
   EndDateInputVariant,
   LifeClockAppMessages,
   MobileTab,
 } from './types'
 import { DEFAULT_END_AGE } from './types'
-import { useColorModeDraft } from './useColorModeDraft'
 import {
   createFormValuesFromConfig,
   useLifeClockConfig,
@@ -46,14 +40,10 @@ export default function LifeClockApp({
   locale: Locale
   messages: LifeClockAppMessages
 }>) {
-  const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
   const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('clock')
   const [isInterfaceVisible, setIsInterfaceVisible] = useState(true)
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'), {
-    noSsr: true,
-  })
-  const endDateVariantInputId = useId()
+  const hasHydratedFormRef = useRef(false)
+  const lastSavedConfigKeyRef = useRef<string | undefined>(undefined)
   const formSchema = useMemo(() => createFormSchema(messages), [messages])
   const {
     config,
@@ -62,26 +52,24 @@ export default function LifeClockApp({
     isInitialized,
     saveConfigFromForm,
   } = useLifeClockConfig(messages)
-  const {
-    currentColorMode,
-    stagedColorMode,
-    cancelColorModeDraft,
-    changeColorModeDraft,
-    commitColorModeDraft,
-    startColorModeDraft,
-  } = useColorModeDraft()
+  const { mode: colorSchemeMode, setMode: setColorSchemeMode } =
+    useColorScheme()
+  const currentColorMode = colorSchemeMode as ColorMode | undefined
 
-  const { control, handleSubmit, reset, resetField } = useForm<
+  const { control, handleSubmit, reset, resetField, setValue } = useForm<
     FormInput,
     unknown,
     FormSchema
   >({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: createEmptyFormValues(false),
   })
+  const formValues = useWatch({ control })
 
   useEffect(() => {
-    if (!isConfigLoaded) {
+    if (!isConfigLoaded || hasHydratedFormRef.current) {
       return
     }
 
@@ -90,63 +78,78 @@ export default function LifeClockApp({
         ? createFormValuesFromConfig(config)
         : createEmptyFormValues(defaultUseAmPm),
     )
+    hasHydratedFormRef.current = true
   }, [config, defaultUseAmPm, isConfigLoaded, reset])
+
+  useEffect(() => {
+    if (!isInitialized) {
+      return
+    }
+
+    const parsedFormValues = formSchema.safeParse(formValues)
+
+    if (!parsedFormValues.success) {
+      return
+    }
+
+    const endDate = getEndDateFromFormData(parsedFormValues.data)
+    const configKey = [
+      parsedFormValues.data.variant,
+      parsedFormValues.data.useAmPm,
+      parsedFormValues.data.startDate.format('YYYY-MM-DD'),
+      endDate.format('YYYY-MM-DD'),
+    ].join('|')
+
+    if (configKey === lastSavedConfigKeyRef.current) {
+      return
+    }
+
+    lastSavedConfigKeyRef.current = configKey
+    saveConfigFromForm(parsedFormValues.data)
+  }, [formSchema, formValues, isInitialized, saveConfigFromForm])
 
   const handleVariantChange = useCallback(
     (variant: EndDateInputVariant) => {
       if (variant === EndDateInputVariantEnum.enum.age) {
         resetField('endDate')
-        resetField('endAge', { defaultValue: DEFAULT_END_AGE })
+        setValue('endAge', DEFAULT_END_AGE, {
+          shouldDirty: true,
+          shouldValidate: true,
+        })
         return
       }
 
-      resetField('endAge', { defaultValue: DEFAULT_END_AGE })
+      if (config) {
+        setValue('endDate', config.endDate, {
+          shouldDirty: true,
+          shouldValidate: true,
+        })
+      }
+      resetField('endAge')
     },
-    [resetField],
+    [config, resetField, setValue],
   )
 
-  const handleOpenConfigDialog = useCallback(() => {
-    startColorModeDraft()
-    setIsConfigDialogOpen(true)
-  }, [startColorModeDraft])
-
-  const handleCloseConfigDialog = useCallback(() => {
-    cancelColorModeDraft()
-    setIsConfigDialogOpen(false)
-  }, [cancelColorModeDraft])
-
-  const handleDialogExited = useCallback(() => {
-    if (!config) {
-      return
-    }
-
-    reset(createFormValuesFromConfig(config))
-  }, [config, reset])
+  const handleColorModeChange = useCallback(
+    (mode: ColorMode) => {
+      setColorSchemeMode(mode)
+    },
+    [setColorSchemeMode],
+  )
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
     saveConfigFromForm(data)
-    commitColorModeDraft()
     setActiveMobileTab('clock')
-    setIsConfigDialogOpen(false)
   }
 
   const submitForm = handleSubmit(onSubmit)
-  const settingsFields = (autoFocus: boolean) => (
+  const settingsFields = (
     <SettingsForm
-      autoFocus={autoFocus}
-      colorMode={stagedColorMode ?? currentColorMode}
+      colorMode={currentColorMode}
       control={control}
-      endDateVariantInputId={endDateVariantInputId}
       messages={messages}
-      onColorModeChange={changeColorModeDraft}
+      onColorModeChange={handleColorModeChange}
       onVariantChange={handleVariantChange}
-    />
-  )
-  const settingsActions = (includeClose: boolean) => (
-    <SettingsActions
-      includeClose={includeClose}
-      messages={messages}
-      onClose={handleCloseConfigDialog}
     />
   )
 
@@ -167,50 +170,26 @@ export default function LifeClockApp({
 
   return (
     <>
-      <DesktopControls
-        isInterfaceVisible={isInterfaceVisible}
-        messages={messages}
-        onOpenSettings={handleOpenConfigDialog}
-        onToggleInterface={() => setIsInterfaceVisible((v) => !v)}
-      />
+      {activeMobileTab === 'clock' ? (
+        <DesktopControls
+          isInterfaceVisible={isInterfaceVisible}
+          messages={messages}
+          onOpenSettings={() => setActiveMobileTab('settings')}
+          onToggleInterface={() => setIsInterfaceVisible((v) => !v)}
+        />
+      ) : null}
       <ClockScreen activeMobileTab={activeMobileTab} config={config} />
-      <MobileSettingsView
+      <SettingsScreen
         activeMobileTab={activeMobileTab}
-        fields={settingsFields(false)}
-        isInitialized={isInitialized}
+        fields={settingsFields}
         messages={messages}
-        onSubmit={submitForm}
-        settingsActions={settingsActions(false)}
+        onBack={() => setActiveMobileTab('clock')}
       />
       <MobileNavigation
         activeMobileTab={activeMobileTab}
         messages={messages}
         onTabChange={setActiveMobileTab}
       />
-      <Dialog
-        open={isConfigDialogOpen}
-        onSubmit={submitForm}
-        slotProps={{
-          paper: {
-            component: 'form',
-            noValidate: true,
-          },
-          transition: {
-            onExited: handleDialogExited,
-          },
-        }}
-        onClose={isInitialized ? handleCloseConfigDialog : undefined}
-      >
-        <DialogTitle>
-          {isInitialized
-            ? messages.dialog.settingsTitle
-            : messages.dialog.welcomeTitle}
-        </DialogTitle>
-        <DialogContent dividers>
-          {settingsFields(!isInitialized && !isMobile)}
-        </DialogContent>
-        {settingsActions(isInitialized)}
-      </Dialog>
     </>
   )
 }

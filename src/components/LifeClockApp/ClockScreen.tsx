@@ -15,10 +15,7 @@ export function ClockScreen({
       container
       sx={{
         height: '100dvh',
-        display: {
-          xs: activeMobileTab === 'clock' ? 'flex' : 'none',
-          sm: 'flex',
-        },
+        display: activeMobileTab === 'clock' ? 'flex' : 'none',
         pt: {
           xs: 'env(safe-area-inset-top)',
           sm: 0,

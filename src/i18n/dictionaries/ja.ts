@@ -129,22 +129,13 @@ const ja = {
       clock: '時計',
       settings: '設定',
     },
-    dialog: {
-      settingsTitle: '設定',
-      welcomeTitle: 'ようこそ',
-      intro: '人生の歩みを、独自の24時間の視点で可視化します。',
-      close: '閉じる',
-      save: '保存',
-    },
     form: {
       startDate: '生年月日',
-      endDateQuestion: '終了日はどのように計算しますか？',
       age: '年齢',
       date: '日付',
       endAge: '終了年齢',
       endDate: '終了日',
       useAmPm: 'AM/PM形式を使用',
-      info: '誕生日を使用して、人生の時計がどれくらい進んでいるかを計算します。平均寿命は、24時間サイクル全体を推定するために役立ちます。この情報はお使いの端末にのみ保存され、共有されません。',
     },
     validation: {
       startDateRequired: '生年月日を入力してください',

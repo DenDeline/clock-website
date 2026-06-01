@@ -127,23 +127,13 @@ const en = {
       clock: 'Clock',
       settings: 'Settings',
     },
-    dialog: {
-      settingsTitle: 'Settings',
-      welcomeTitle: 'Welcome',
-      intro:
-        "Visualize your life's journey through a unique 24-hour perspective.",
-      close: 'Close',
-      save: 'Save',
-    },
     form: {
       startDate: 'Date of birth',
-      endDateQuestion: 'How should the end date be calculated?',
       age: 'Age',
       date: 'Date',
       endAge: 'End age',
       endDate: 'End date',
       useAmPm: 'Use AM/PM time',
-      info: "We use your birthday to calculate how far you are along your life's clock. The mean lifespan helps us estimate the full 24-hour cycle. This information is only stored on your device and is not shared.",
     },
     validation: {
       startDateRequired: 'Date of birth must not be empty',

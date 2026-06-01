@@ -18,6 +18,7 @@ export function createFormValuesFromConfig(config: LifeClockConfig): FormInput {
   const baseValues = {
     useAmPm: config.useAmPm,
     startDate: config.startDate,
+    privacyAccepted: true,
   }
 
   if (config.variant === 'date') {

@@ -107,6 +107,8 @@ const ja = {
       body: '生年月日を入力すると、人生をひとつのシンプルな1日として表示できます。',
       birthDate: '生年月日',
       getStarted: 'はじめる',
+      privacyPrefix: '私は次の内容を読み、同意します:',
+      privacyLink: 'プライバシーポリシー',
       storageNote:
         '入力した日付はこのブラウザ内にのみ保存され、サーバーへ送信されません。',
     },
@@ -151,6 +153,8 @@ const ja = {
       invalidDate: '日付が正しくありません',
       endAgePositive: '終了年齢は0より大きい値にしてください',
       endDateAfterStart: '終了日は生年月日より後の日付にしてください',
+      privacyAcceptedRequired:
+        '続行するにはプライバシーポリシーへの同意が必要です',
     },
     pwa: {
       updateAvailable: '新しいバージョンがあります。',

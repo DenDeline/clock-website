@@ -105,6 +105,8 @@ const en = {
       body: 'Enter your date of birth to see your life mapped onto one simple day.',
       birthDate: 'Date of birth',
       getStarted: 'Get started',
+      privacyPrefix: 'I have read and agree to the',
+      privacyLink: 'Privacy Policy',
       storageNote:
         'The date you enter is saved in this browser only and is never sent to a server.',
     },
@@ -150,6 +152,8 @@ const en = {
       invalidDate: 'Invalid date',
       endAgePositive: 'End age must be greater than 0',
       endDateAfterStart: 'End date must be after date of birth',
+      privacyAcceptedRequired:
+        'You must agree to the Privacy Policy to continue',
     },
     pwa: {
       updateAvailable: 'A new version is available.',

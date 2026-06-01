@@ -59,6 +59,9 @@ export function createFormSchema(messages: LifeClockAppMessages) {
   const baseSchema = {
     useAmPm: z.boolean(),
     startDate: createStartDateSchema(messages),
+    privacyAccepted: z.boolean().refine((value) => value, {
+      message: messages.validation.privacyAcceptedRequired,
+    }),
   }
 
   return z.discriminatedUnion('variant', [
@@ -123,5 +126,6 @@ export function createEmptyFormValues(useAmPm: boolean): FormInput {
     useAmPm,
     startDate: null as unknown as Dayjs,
     endAge: DEFAULT_END_AGE,
+    privacyAccepted: false,
   }
 }

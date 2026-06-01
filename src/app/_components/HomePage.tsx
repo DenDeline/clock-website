@@ -55,7 +55,7 @@ export default function HomePage({ locale }: Readonly<{ locale: Locale }>) {
             minHeight: 'var(--life-app-height, 100dvh)',
           }}
         >
-          <LifeClockApp messages={dictionary.app} />
+          <LifeClockApp locale={locale} messages={dictionary.app} />
         </Box>
       </Box>
     </>

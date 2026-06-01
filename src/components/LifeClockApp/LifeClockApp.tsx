@@ -11,6 +11,8 @@ import { useTheme } from '@mui/material/styles'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 
+import type { Locale } from '@/i18n'
+
 import { ClockScreen } from './ClockScreen'
 import { DesktopControls } from './DesktopControls'
 import { MobileNavigation } from './MobileNavigation'
@@ -38,8 +40,10 @@ import {
 } from './useLifeClockConfig'
 
 export default function LifeClockApp({
+  locale,
   messages,
 }: Readonly<{
+  locale: Locale
   messages: LifeClockAppMessages
 }>) {
   const [isConfigDialogOpen, setIsConfigDialogOpen] = useState(false)
@@ -154,6 +158,7 @@ export default function LifeClockApp({
     return (
       <OnboardingView
         control={control}
+        locale={locale}
         messages={messages}
         onSubmit={submitForm}
       />

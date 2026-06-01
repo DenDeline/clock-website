@@ -1,18 +1,33 @@
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  Link,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { DateField } from '@mui/x-date-pickers'
+import NextLink from 'next/link'
 import type { SubmitEventHandler } from 'react'
 import { Controller, type Control } from 'react-hook-form'
+
+import { getLocalizedPath, type Locale } from '@/i18n/config'
 
 import type { FormInput } from './schema'
 import type { LifeClockAppMessages } from './types'
 
 export function OnboardingView({
   control,
+  locale,
   messages,
   onSubmit,
 }: Readonly<{
   control: Control<FormInput>
+  locale: Locale
   messages: LifeClockAppMessages
   onSubmit: SubmitEventHandler<HTMLFormElement>
 }>) {
@@ -118,6 +133,49 @@ export function OnboardingView({
                   },
                 }}
               />
+            )}
+          />
+          <Controller
+            name='privacyAccepted'
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <FormControl error={!!error} required>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={field.value}
+                      name={field.name}
+                      onBlur={field.onBlur}
+                      onChange={(event) => field.onChange(event.target.checked)}
+                      slotProps={{
+                        input: {
+                          ref: field.ref,
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <>
+                      {messages.onboarding.privacyPrefix}{' '}
+                      <Link
+                        component={NextLink}
+                        href={getLocalizedPath('/privacy', locale)}
+                      >
+                        {messages.onboarding.privacyLink}
+                      </Link>
+                    </>
+                  }
+                  sx={{
+                    m: 0,
+                    textAlign: 'left',
+                  }}
+                />
+                {error ? (
+                  <FormHelperText sx={{ ml: 4 }}>
+                    {error.message}
+                  </FormHelperText>
+                ) : null}
+              </FormControl>
             )}
           />
           <Button
